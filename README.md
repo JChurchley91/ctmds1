@@ -41,13 +41,13 @@ python main.py generate-random-numbers <strategy_name> <number_count>
 Generate 10 random numbers using the basic_generator strategy:
 
 ```bash
-python main.py generate-random-numbers basic_generator 10
+python main.py basic_generator 10
 ```
 
 Generate 20 random numbers using the numpy_generator strategy:
 
 ```bash
-python main.py generate-random-numbers numpy_generator 20
+python main.py numpy_generator 20
 ```
 
 ### Testing

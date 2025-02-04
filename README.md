@@ -23,7 +23,7 @@ This project is a command-line application for generating random numbers using d
 
 ## Usage
 
-To generate random numbers, use the `generate_random_numbers` command with the desired strategy and number count.
+To generate random numbers, run the main.py file with the desired strategy and number count.
 
 ### Available Strategies
 
@@ -33,7 +33,7 @@ To generate random numbers, use the `generate_random_numbers` command with the d
 ### Command Syntax
 
 ```bash
-python main.py generate-random-numbers <strategy_name> <number_count>
+python main.py <strategy_name> <number_count>
 ```
 
 ### Examples

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ctmds-v2"
+version = "0.1.0"
+description = ""
+authors = ["JChurchley91 <joseph.churchley@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = "^0.15.1"
+numpy = "^2.2.2"
+pytest = "^8.3.4"
+ruff = "^0.9.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

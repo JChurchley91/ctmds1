@@ -16,7 +16,8 @@ def generate_random_numbers(count: int) -> list:
         for x in range(count):
             random_number: float = round(random.uniform(0, 100), 2)
             random_numbers_list.append(random_number)
-            return random_numbers_list
+
+        return random_numbers_list
 
     except TypeError:
         return "please ensure the count is an integer"

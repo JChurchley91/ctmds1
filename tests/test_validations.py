@@ -15,6 +15,7 @@ from utils.validations import (
     validate_for_date,
 )
 
+
 def test_validate_strategy():
     """
     Test the validate_strategy function.
@@ -27,6 +28,7 @@ def test_validate_strategy():
     with pytest.raises(typer.Exit) as error:
         import_strategy_module("invalid_strategy")
         assert error.value.exit_code == 1
+
 
 def test_validate_country_code():
     """
@@ -41,6 +43,7 @@ def test_validate_country_code():
         validate_country_code("invalid_country_code")
         assert error.value.exit_code == 1
 
+
 def test_validate_granularity():
     """
     Test the validate_granularity function.
@@ -53,6 +56,7 @@ def test_validate_granularity():
     with pytest.raises(typer.Exit) as error:
         validate_granularity("invalid_granularity")
         assert error.value.exit_code == 1
+
 
 def test_validate_for_date():
     """

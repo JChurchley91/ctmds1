@@ -8,7 +8,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from main import import_strategy_module
 
 
-
 def test_import_strategy_module():
     """
     Test the import_strategy_module function.

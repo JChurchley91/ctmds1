@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from numpy import ndarray
 from constants import COUNTRY_CODE_PRICES
 
-def hours_in_day(date: datetime, timezone_str: str = 'UTC') -> int:
+
+def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
     """
     Return the number of hours in a day for the specified date and timezone.
 
@@ -46,13 +47,17 @@ def generate_prices(for_date: datetime, country_code: str, granularity: str) -> 
     """
 
     base_price = COUNTRY_CODE_PRICES[country_code]
-    hours_in_for_date = hours_in_day(for_date, 'Europe/London')
+    hours_in_for_date = hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":
-        prices: ndarray = np.random.normal(loc=base_price, scale=5, size=hours_in_for_date)
+        prices: ndarray = np.random.normal(
+            loc=base_price, scale=5, size=hours_in_for_date
+        )
         return np.round(prices, 2)
     if granularity == "hh":
-        prices: ndarray = np.random.normal(loc=base_price, scale=5, size=(hours_in_for_date*2))
+        prices: ndarray = np.random.normal(
+            loc=base_price, scale=5, size=(hours_in_for_date * 2)
+        )
         return np.round(prices, 2)
     else:
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")

@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from strategies.numpy_generator import generate_random_numbers
 
+
 def test_generate_random_numbers():
     """
     Test the generate_random_numbers function.

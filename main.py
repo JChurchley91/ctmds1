@@ -86,7 +86,7 @@ def model_prices(
     ):
         try:
             strategy_module = import_strategy_module("price_generator")
-            prices = strategy_module.generate_prices(country_code, granularity)
+            prices = strategy_module.generate_prices(for_date, country_code, granularity)
             typer.echo(f"Prices for {for_date} in {country_code} ({granularity}):")
             for index, price in enumerate(prices):
                 typer.echo(f"Observation {index + 1}: {price}")

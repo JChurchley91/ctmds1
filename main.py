@@ -3,6 +3,8 @@ import importlib
 import datetime
 
 from utils.timer import log_generation_time
+from typing_extensions import Annotated
+
 
 STRATEGIES = ["basic_generator", "numpy_generator"]
 app = typer.Typer()
@@ -37,7 +39,14 @@ def import_strategy_module(strategy_name: str) -> importlib:
 
 
 @app.command()
-def generate_random_numbers(strategy_name: str, number_count: int) -> None:
+def generate_random_numbers(
+    strategy_name: Annotated[
+        str, typer.Option(help="The strategy to use when generating random numbers")
+    ],
+    number_count: Annotated[
+        int, typer.Option(help="The number of random numbers to be generated")
+    ],
+) -> None:
     """
     Generate random numbers using the specified strategy.
 

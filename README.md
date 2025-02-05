@@ -33,7 +33,7 @@ To generate random numbers, run the main.py file with the desired strategy and n
 ### Command Syntax
 
 ```bash
-python main.py <strategy_name> <number_count>
+python main.py --strategy-name <strategy_name> --number-count <number_count>
 ```
 
 ### Examples
@@ -41,13 +41,13 @@ python main.py <strategy_name> <number_count>
 Generate 10 random numbers using the basic_generator strategy:
 
 ```bash
-python main.py basic_generator 10
+python main.py --strategy-name basic_generator --number-count 10
 ```
 
 Generate 20 random numbers using the numpy_generator strategy:
 
 ```bash
-python main.py numpy_generator 20
+python main.py --strategy-name numpy_generator --number-count 20
 ```
 
 ### Testing

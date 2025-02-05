@@ -2,26 +2,16 @@ import typer
 import importlib
 import datetime
 
-from utils.timer import log_generation_time
 from typing_extensions import Annotated
+from utils.timer import log_generation_time
+from utils.validations import (
+    validate_strategy,
+    validate_country_code,
+    validate_granularity,
+    validate_for_date,
+)
 
-
-STRATEGIES = ["basic_generator", "numpy_generator"]
 app = typer.Typer()
-
-
-def validate_strategy(strategy_name: str) -> bool:
-    """
-    Validate the strategy name.
-
-    :param strategy_name:
-    :return: bool
-    """
-    if strategy_name in STRATEGIES:
-        return True
-    else:
-        typer.echo(f"Invalid strategy: {strategy_name}. Program will exit.")
-        raise typer.Exit(code=1)
 
 
 def import_strategy_module(strategy_name: str) -> importlib:
@@ -50,8 +40,8 @@ def generate_random_numbers(
     """
     Generate random numbers using the specified strategy.
 
-    :param strategy_name:
-    :param number_count:
+    :param strategy_name: the strategy to use when generating random numbers
+    :param number_count: the number of random numbers to be generated
     :return: None
     """
 
@@ -68,6 +58,41 @@ def generate_random_numbers(
 
         except Exception as error:
             typer.echo(f"Error generating random numbers: {error}. Program will exit.")
+            raise typer.Exit(code=1)
+
+
+@app.command()
+def model_prices(
+    for_date: Annotated[
+        datetime.datetime, typer.Option(help="The date in which to return prices for")
+    ],
+    country_code: Annotated[
+        str, typer.Option(help="The country code of the country to return prices for")
+    ],
+    granularity: Annotated[str, typer.Option(help="The granularity of the prices")],
+) -> None:
+    """
+    Return prices for the specified date, country code, and granularity.
+
+    :param for_date: the date to model prices for
+    :param country_code: the country code of the country to model prices for
+    :param granularity: the granularity of the prices
+    :return: None
+    """
+    if (
+        validate_for_date(for_date)
+        and validate_country_code(country_code)
+        and validate_granularity(granularity)
+    ):
+        try:
+            strategy_module = import_strategy_module("price_generator")
+            prices = strategy_module.generate_prices(country_code, granularity)
+            typer.echo(f"Prices for {for_date} in {country_code} ({granularity}):")
+            for index, price in enumerate(prices):
+                typer.echo(f"Observation {index + 1}: {price}")
+
+        except Exception as error:
+            typer.echo(f"Error modeling prices: {error}. Program will exit.")
             raise typer.Exit(code=1)
 
 

@@ -21,11 +21,13 @@ This project is a command-line application for generating random numbers using d
     pip install -r requirements.txt
     ```
 
-## Usage
+## Generating Random Numbers
 
 To generate random numbers, run the main.py file with the desired strategy and number count.
 
 ### Available Strategies
+
+The following strategies are available for generating random numbers:
 
 - `basic_generator`
 - `numpy_generator`
@@ -33,22 +35,63 @@ To generate random numbers, run the main.py file with the desired strategy and n
 ### Command Syntax
 
 ```bash
-python main.py --strategy-name <strategy_name> --number-count <number_count>
+python main.py --commmand-name --strategy-name <strategy_name> --number-count <number_count>
 ```
 
-### Examples
+#### Examples
 
 Generate 10 random numbers using the basic_generator strategy:
 
 ```bash
-python main.py --strategy-name basic_generator --number-count 10
+python main.py generate-random-numbers --strategy-name basic_generator --number-count 10
 ```
 
 Generate 20 random numbers using the numpy_generator strategy:
 
 ```bash
-python main.py --strategy-name numpy_generator --number-count 20
+python main.py generate-random-numbers --strategy-name numpy_generator --number-count 20
 ```
+
+## Generating Random Prices
+
+To generate random daily prices, run the main.py file with the desired date, country code and granularity.
+
+### Available Country Codes
+
+The following country codes are available for generating random daily prices:
+
+- 'GB'
+- 'FR'
+- 'NL'
+- 'DE'
+
+## Available Granularity
+
+The following granularity are available for generating random daily prices:
+
+- 'h' (hourly)
+- 'hh' (half-hourly)
+
+### Command Syntax
+
+```bash
+python main.py --commmand-name --for-date <for_date> --country-code <country_code> --granularity <granularity>
+```
+
+#### Examples
+
+Generate hourly prices for 2025-05-02 for GB:
+
+```bash
+python main.py model-prices --for-date 2025-05-02 --country-code GB --granularity h
+```
+
+Generate half-hourly prices for 2025-05-02 for DE:
+
+```bash
+python main.py model-prices --for-date 2025-05-02 --country-code DE --granularity hh
+```
+
 
 ### Testing
 
@@ -66,5 +109,8 @@ The project has the following structure:
 * strategies/: Directory containing the random number generation strategies.
     * strategies/basic_generator.py: A basic random number generator strategy.
     * strategies/numpy_generator.py: A random number generator strategy using NumPy.
-* utils/timer.py: Utility functions for logging generation time.
+    * strategies/price_model.py: A random price model generator.
+* utils/: Directory containing utility functions.
+  * utils/timer.py: Utility functions for logging generation time.
+  * utils/validators.py: Utility functions for validating input arguments.
 * tests/: Directory containing test files.

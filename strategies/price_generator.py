@@ -34,7 +34,7 @@ def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
     return int(hours)
 
 
-def generate_prices(for_date: datetime, country_code: str, granularity: str) -> None:
+def generate_prices(for_date: datetime, country_code: str, granularity: str) -> np.ndarray[float]:
     """
     Return hourly prices for the specified date and country code.
     Maps the country_code param to COUNTRY_CODE_PRICES dictionary to return a base price.

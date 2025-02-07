@@ -12,6 +12,7 @@ numpy = "^2.2.2"
 pytest = "^8.3.4"
 ruff = "^0.9.4"
 pytz = "^2025.1"
+pyright = "^1.1.393"
 
 
 [build-system]

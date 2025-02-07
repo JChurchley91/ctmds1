@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def generate_random_numbers(count: int) -> np.ndarray[float]:
+def generate_random_numbers(count: int) -> np.ndarray[float] | str :
     """
     Generate a range of random numbers equal to the count param.
     Each number is a float between 0 and 100 rounded to 2 decimal places.

@@ -3,7 +3,7 @@ import importlib
 import datetime
 
 from typing_extensions import Annotated
-from options import Strategies, CountryCodes, Granularity
+from options import Strategies, CountryCodes, Granularity, Commodity
 from utils.timer import log_generation_time
 
 app = typer.Typer()
@@ -65,6 +65,9 @@ def model_prices(
     granularity: Annotated[
         Granularity, typer.Option(help="The granularity of the prices to be returned")
     ],
+    commodity: Annotated[
+        Commodity, typer.Option(help="The commodity to return prices for")
+    ],
 ) -> None:
     """
     Return prices for the specified date, country code, and granularity.
@@ -72,12 +75,13 @@ def model_prices(
     :param for_date: the date to model prices for
     :param country_code: the country code of the country to model prices for
     :param granularity: the granularity of the prices
+    :param commodity: the commodity to model prices for
     :return: None
     """
     strategy_module = import_strategy_module("price_generator")
     prices = strategy_module.generate_prices(for_date, country_code, granularity)
 
-    typer.echo(f"price data for {for_date.date()} in {country_code} ({granularity}):")
+    typer.echo(f"{commodity.value} price data for {for_date.date()} in {country_code.value} ({granularity.value}):")
 
     for index, price in enumerate(prices):
         if granularity == "h":

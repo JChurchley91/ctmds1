@@ -42,3 +42,8 @@ class CountryCodes(str, Enum):
 class Granularity(str, Enum):
     h = "h"
     hh = "hh"
+
+class Commodity(str, Enum):
+    power = 'power'
+    natural_gas = 'natural_gas'
+    crude = 'crude'

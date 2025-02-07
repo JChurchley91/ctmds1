@@ -81,7 +81,9 @@ def model_prices(
     strategy_module = import_strategy_module("price_generator")
     prices = strategy_module.generate_prices(for_date, country_code, granularity)
 
-    typer.echo(f"{commodity.value} price data for {for_date.date()} in {country_code.value} ({granularity.value}):")
+    typer.echo(
+        f"{commodity.value} price data for {for_date.date()} in {country_code.value} ({granularity.value}):"
+    )
 
     for index, price in enumerate(prices):
         if granularity == "h":

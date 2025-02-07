@@ -1,7 +1,7 @@
 import random
 
 
-def generate_random_numbers(count: int) -> list|str:
+def generate_random_numbers(count: int) -> list | str:
     """
     Generate a range of random numbers equal to the count param.
     Each number is a float between 0 and 100 rounded to 2 decimal places.

@@ -3,13 +3,8 @@ import importlib
 import datetime
 
 from typing_extensions import Annotated
+from options import Strategies, CountryCodes, Granularity
 from utils.timer import log_generation_time
-from utils.validations import (
-    validate_strategy,
-    validate_country_code,
-    validate_granularity,
-    validate_for_date,
-)
 
 app = typer.Typer()
 
@@ -31,7 +26,8 @@ def import_strategy_module(strategy_name: str) -> importlib:
 @app.command()
 def generate_random_numbers(
     strategy_name: Annotated[
-        str, typer.Option(help="The strategy to use when generating random numbers")
+        Strategies,
+        typer.Option(help="The strategy to use when generating random numbers"),
     ],
     number_count: Annotated[
         int, typer.Option(help="The number of random numbers to be generated")
@@ -44,21 +40,17 @@ def generate_random_numbers(
     :param number_count: the number of random numbers to be generated
     :return: None
     """
+    try:
+        strategy_module = import_strategy_module(strategy_name)
+        start_time = datetime.datetime.now()
+        strategy_module.generate_random_numbers(number_count)
+        finish_time = datetime.datetime.now()
+        time_difference = log_generation_time(start_time, finish_time)
+        typer.echo(f"{number_count} numbers generated in {time_difference} seconds.")
 
-    if validate_strategy(strategy_name):
-        try:
-            strategy_module = import_strategy_module(strategy_name)
-            start_time = datetime.datetime.now()
-            strategy_module.generate_random_numbers(number_count)
-            finish_time = datetime.datetime.now()
-            time_difference = log_generation_time(start_time, finish_time)
-            typer.echo(
-                f"{number_count} numbers generated in {time_difference} seconds."
-            )
-
-        except Exception as error:
-            typer.echo(f"Error generating random numbers: {error}. Program will exit.")
-            raise typer.Exit(code=1)
+    except Exception as error:
+        typer.echo(f"Error generating random numbers: {error}. Program will exit.")
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -67,9 +59,12 @@ def model_prices(
         datetime.datetime, typer.Option(help="The date in which to return prices for")
     ],
     country_code: Annotated[
-        str, typer.Option(help="The country code of the country to return prices for")
+        CountryCodes,
+        typer.Option(help="The country code of the country to return prices for"),
     ],
-    granularity: Annotated[str, typer.Option(help="The granularity of the prices")],
+    granularity: Annotated[
+        Granularity, typer.Option(help="The granularity of the prices to be returned")
+    ],
 ) -> None:
     """
     Return prices for the specified date, country code, and granularity.
@@ -79,39 +74,23 @@ def model_prices(
     :param granularity: the granularity of the prices
     :return: None
     """
-    if (
-        validate_for_date(for_date)
-        and validate_country_code(country_code)
-        and validate_granularity(granularity)
-    ):
-        try:
-            strategy_module = import_strategy_module("price_generator")
-            prices = strategy_module.generate_prices(
-                for_date, country_code, granularity
+    strategy_module = import_strategy_module("price_generator")
+    prices = strategy_module.generate_prices(for_date, country_code, granularity)
+
+    typer.echo(f"price data for {for_date.date()} in {country_code} ({granularity}):")
+
+    for index, price in enumerate(prices):
+        if granularity == "h":
+            time = for_date.replace(hour=index, minute=0, second=0, microsecond=0)
+            typer.echo(f"{time.time()} - {price}")
+        if granularity == "hh":
+            time = for_date.replace(
+                hour=index // 2,
+                minute=(index % 2) * 30,
+                second=0,
+                microsecond=0,
             )
-
-            typer.echo(
-                f"price data for {for_date.date()} in {country_code} ({granularity}):"
-            )
-
-            for index, price in enumerate(prices):
-                if granularity == "h":
-                    time = for_date.replace(
-                        hour=index, minute=0, second=0, microsecond=0
-                    )
-                    typer.echo(f"{time.time()} - {price}")
-                if granularity == "hh":
-                    time = for_date.replace(
-                        hour=index // 2,
-                        minute=(index % 2) * 30,
-                        second=0,
-                        microsecond=0,
-                    )
-                    typer.echo(f"{time.time()} - {price}")
-
-        except Exception as error:
-            typer.echo(f"Error modeling prices: {error}. Program will exit.")
-            raise typer.Exit(code=1)
+            typer.echo(f"{time.time()} - {price}")
 
 
 if __name__ == "__main__":

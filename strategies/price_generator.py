@@ -3,7 +3,7 @@ import pytz
 
 from datetime import datetime, timedelta
 from numpy import ndarray
-from constants import COUNTRY_CODE_PRICES
+from options import CountryCodes
 
 
 def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
@@ -46,7 +46,7 @@ def generate_prices(for_date: datetime, country_code: str, granularity: str) -> 
     :return: None
     """
 
-    base_price = COUNTRY_CODE_PRICES[country_code]
+    base_price = CountryCodes.get_price(country_code)
     hours_in_for_date = hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":

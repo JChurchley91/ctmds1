@@ -89,9 +89,25 @@ def model_prices(
             prices = strategy_module.generate_prices(
                 for_date, country_code, granularity
             )
-            typer.echo(f"Prices for {for_date} in {country_code} ({granularity}):")
+
+            typer.echo(
+                f"price data for {for_date.date()} in {country_code} ({granularity}):"
+            )
+
             for index, price in enumerate(prices):
-                typer.echo(f"Observation {index + 1}: {price}")
+                if granularity == "h":
+                    time = for_date.replace(
+                        hour=index, minute=0, second=0, microsecond=0
+                    )
+                    typer.echo(f"{time.time()} - {price}")
+                if granularity == "hh":
+                    time = for_date.replace(
+                        hour=index // 2,
+                        minute=(index % 2) * 30,
+                        second=0,
+                        microsecond=0,
+                    )
+                    typer.echo(f"{time.time()} - {price}")
 
         except Exception as error:
             typer.echo(f"Error modeling prices: {error}. Program will exit.")

@@ -1,7 +1,5 @@
 # Random Number Generator
 
-This project is a command-line application for generating random numbers using different strategies. It is built using Python and Typer.
-
 ## Installation
 
 1. Clone the repository:

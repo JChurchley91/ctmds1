@@ -1,5 +1,3 @@
-# Random Number Generator
-
 ## Installation
 
 1. Clone the repository:

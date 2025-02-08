@@ -19,3 +19,4 @@ def get_season(date: datetime) -> str:
     for season, (start, end) in seasons.items():
         if start <= date <= end:
             return season
+

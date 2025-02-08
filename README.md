@@ -75,7 +75,7 @@ The following granularity are available for generating random daily prices:
 ### Command Syntax
 
 ```bash
-python main.py --commmand-name --for-date <for_date> --country-code <country_code> --granularity <granularity>
+python main.py --commmand-name --for-date <for_date> --country-code <country_code> --granularity <granularity> --commodity <commodity>
 ```
 
 #### Examples
@@ -83,13 +83,13 @@ python main.py --commmand-name --for-date <for_date> --country-code <country_cod
 Generate hourly prices for 2025-05-02 for GB:
 
 ```bash
-python main.py model-prices --for-date 2025-05-02 --country-code GB --granularity h
+python main.py model-prices --for-date 2025-05-02 --country-code GB --granularity h --commodity crude
 ```
 
 Generate half-hourly prices for 2025-05-02 for DE:
 
 ```bash
-python main.py model-prices --for-date 2025-05-02 --country-code DE --granularity hh
+python main.py model-prices --for-date 2025-05-02 --country-code DE --granularity hh --commodity power  
 ```
 
 

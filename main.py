@@ -79,7 +79,7 @@ def model_prices(
     :return: None
     """
     strategy_module = import_strategy_module("price_generator")
-    prices = strategy_module.generate_prices(for_date, country_code, granularity)
+    prices = strategy_module.generate_prices(for_date, country_code, granularity, commodity)
 
     typer.echo(
         f"{commodity.value} price data for {for_date.date()} in {country_code.value} ({granularity.value}):"

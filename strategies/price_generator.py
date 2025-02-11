@@ -4,7 +4,7 @@ import pytz
 from datetime import datetime, timedelta
 from numpy import ndarray
 from options import CountryCodes
-from utils.seasonality import get_season, model_seasonality
+from utils.seasonality import get_season, model_seasonality, model_peak_hours
 
 
 def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
@@ -35,8 +35,9 @@ def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
     return int(hours)
 
 
+
 def generate_prices(
-    for_date: datetime, country_code: str, granularity: str
+    for_date: datetime, country_code: str, granularity: str, commodity: str
 ) -> np.ndarray[float]:
     """
     Return hourly prices for the specified date and country code.
@@ -46,12 +47,14 @@ def generate_prices(
     :param for_date: the date to return hourly prices for
     :param country_code: the country code of the country to return hourly prices for
     :param granularity: the granularity of the prices to be returned
+    :param commodity: the commodity to return prices for
     :return: None
     """
 
     base_price = CountryCodes.get_price(country_code)
     season = get_season(for_date)
-    seasonality_factor = model_seasonality("power", season)
+    seasonality_factor = model_seasonality(season, commodity)
+    peak_hours = model_peak_hours(season, commodity)
     hours_in_for_date = hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":

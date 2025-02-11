@@ -20,7 +20,7 @@ def get_season(date: datetime) -> str:
         if start <= date <= end:
             return season
 
-def model_seasonality(commodity: str, season: str) -> float:
+def model_seasonality(season: str, commodity: str) -> float:
     """
     Model seasonality for a given commodity and season.
 
@@ -50,3 +50,37 @@ def model_seasonality(commodity: str, season: str) -> float:
     }
 
     return seasonality_factors[commodity][season]
+
+def model_peak_hours(season: str, commodity: str) -> list[int]:
+    """
+    Model peak hours for a given date.
+
+    :param season: The season to model peak hours for
+    :param commodity: The commodity to model peak hours for
+    
+    :return: A list of peak hours
+    """
+    peak_hours = {
+        "spring": {
+            "power": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+            "natural_gas": [6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            "crude": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        },
+        "summer": {
+            "power": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+            "natural_gas": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            "crude": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+        },
+        "autumn": {
+            "power": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+            "natural_gas": [6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            "crude": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        },
+        "winter": {
+            "power": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            "natural_gas": [6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            "crude": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        },
+    }
+
+    return peak_hours[season][commodity]

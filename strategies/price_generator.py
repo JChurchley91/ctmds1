@@ -4,6 +4,7 @@ import pytz
 from datetime import datetime, timedelta
 from numpy import ndarray
 from options import CountryCodes
+from utils.seasonality import get_season, model_seasonality
 
 
 def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
@@ -49,11 +50,13 @@ def generate_prices(
     """
 
     base_price = CountryCodes.get_price(country_code)
+    season = get_season(for_date)
+    seasonality_factor = model_seasonality("power", season)
     hours_in_for_date = hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":
         prices: ndarray = np.random.normal(
-            loc=base_price, scale=5, size=hours_in_for_date
+            loc=base_price*seasonality_factor, scale=5, size=hours_in_for_date
         )
         return np.round(prices, 2)
     if granularity == "hh":

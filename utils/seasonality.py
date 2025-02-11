@@ -20,3 +20,33 @@ def get_season(date: datetime) -> str:
         if start <= date <= end:
             return season
 
+def model_seasonality(commodity: str, season: str) -> float:
+    """
+    Model seasonality for a given commodity and season.
+
+    :param commodity: The commodity to model seasonality for
+    :param season: The season to model seasonality for
+    :return: The seasonality factor
+    """
+    seasonality_factors = {
+        "power": {
+            "spring": 0.5,
+            "summer": 1.5,
+            "autumn": 0.5,
+            "winter": 1.5,
+        },
+        "natural_gas": {
+            "spring": 0.8,
+            "summer": 0.5,
+            "autumn": 1.0,
+            "winter": 1.5,
+        },
+        "crude": {
+            "spring": 0.8,
+            "summer": 1.0,
+            "autumn": 1.2,
+            "winter": 1.5,
+        },
+    }
+
+    return seasonality_factors[commodity][season]

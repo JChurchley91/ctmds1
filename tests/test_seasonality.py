@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.seasonality import get_season
+from utils.seasonality import get_season, model_seasonality
 
 def test_get_season():
     """
@@ -17,3 +17,12 @@ def test_get_season():
 
     date = datetime(2022, 12, 21)
     assert get_season(date) == "winter"
+    
+def test_model_seasonality():
+    """
+    Test the model_seasonality function
+    Assert that the function returns the correct seasonality factor for a given commodity and season.
+    """
+    assert model_seasonality("power", "summer") == 1.5
+    assert model_seasonality("natural_gas", "spring") == 0.8
+    assert model_seasonality("crude", "winter") == 1.5

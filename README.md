@@ -109,4 +109,5 @@ The project has the following structure:
 * utils/: Directory containing utility functions.
   * utils/timer.py: Utility functions for logging generation time.
   * utils/validators.py: Utility functions for validating input arguments.
+  * utils/seas.py: Utility functions for generating seasonal data.
 * tests/: Directory containing test files.

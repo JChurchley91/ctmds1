@@ -4,7 +4,12 @@ import pytz
 from datetime import datetime, timedelta
 from numpy import ndarray
 from options import CountryCodes
-from utils.seasonality import get_season, model_seasonality, model_peak_hours
+from utils.seasonality import (
+    get_season,
+    model_seasonality,
+    model_peak_hours,
+    model_off_peak_hours,
+)
 
 
 def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
@@ -55,6 +60,7 @@ def generate_prices(
     season = get_season(for_date)
     seasonality_factor = model_seasonality(season, commodity)
     peak_hours = model_peak_hours(season, commodity)
+    off_peak_hours = model_off_peak_hours(season, commodity)
     hours_in_for_date = hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":
@@ -62,6 +68,7 @@ def generate_prices(
             loc=base_price * seasonality_factor, scale=5, size=hours_in_for_date
         )
         prices[peak_hours] += 20
+        prices[off_peak_hours] -= 40
         return np.round(prices, 2)
 
     if granularity == "hh":
@@ -69,6 +76,7 @@ def generate_prices(
             loc=base_price, scale=5, size=(hours_in_for_date * 2)
         )
         prices[peak_hours] += 20
+        prices[off_peak_hours] -= 40
         return np.round(prices, 2)
     else:
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")

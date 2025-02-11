@@ -29,11 +29,12 @@ def test_generate_prices():
     date = datetime.datetime(2025, 3, 29, 0, 0, 0)
     country_code = "GB"
     granularity = "h"
+    commodity = "power"
 
-    assert generate_prices(date, country_code, granularity) is not None
-    assert len(generate_prices(date, country_code, granularity)) == 24
+    assert generate_prices(date, country_code, granularity, commodity) is not None
+    assert len(generate_prices(date, country_code, granularity, commodity)) == 24
 
     granularity = "hh"
 
-    assert generate_prices(date, country_code, granularity) is not None
-    assert len(generate_prices(date, country_code, granularity)) == 48
+    assert generate_prices(date, country_code, granularity, commodity) is not None
+    assert len(generate_prices(date, country_code, granularity, commodity)) == 48

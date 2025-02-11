@@ -86,3 +86,17 @@ def model_peak_hours(season: str, commodity: str) -> list[int]:
     }
 
     return peak_hours[season][commodity]
+
+
+def model_off_peak_hours(season: str, commodity: str) -> list[int]:
+    """
+    Model off-peak hours for a given date.
+
+    :param season: The season to model off-peak hours for
+    :param commodity: The commodity to model off-peak hours for
+    :return: A list of off-peak hours
+    """
+    peak_hours = model_peak_hours(season, commodity)
+    hours_in_day = 24
+    off_peak_hours = [hour for hour in range(hours_in_day) if hour not in peak_hours]
+    return off_peak_hours

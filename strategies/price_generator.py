@@ -35,7 +35,6 @@ def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
     return int(hours)
 
 
-
 def generate_prices(
     for_date: datetime, country_code: str, granularity: str, commodity: str
 ) -> np.ndarray[float]:
@@ -43,6 +42,7 @@ def generate_prices(
     Return hourly prices for the specified date and country code.
     Maps the country_code param to COUNTRY_CODE_PRICES dictionary to return a base price.
     Uses the base price as a starting point to generate hourly prices for the specified date.
+    Uses the seasonality factor and peak hours to adjust the prices accordingly.
 
     :param for_date: the date to return hourly prices for
     :param country_code: the country code of the country to return hourly prices for
@@ -59,13 +59,16 @@ def generate_prices(
 
     if granularity == "h":
         prices: ndarray = np.random.normal(
-            loc=base_price*seasonality_factor, scale=5, size=hours_in_for_date
+            loc=base_price * seasonality_factor, scale=5, size=hours_in_for_date
         )
+        prices[peak_hours] += 20
         return np.round(prices, 2)
+
     if granularity == "hh":
         prices: ndarray = np.random.normal(
             loc=base_price, scale=5, size=(hours_in_for_date * 2)
         )
+        prices[peak_hours] += 20
         return np.round(prices, 2)
     else:
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")

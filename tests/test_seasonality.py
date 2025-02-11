@@ -1,6 +1,7 @@
 from datetime import datetime
 from utils.seasonality import get_season, model_seasonality
 
+
 def test_get_season():
     """
     Test the get_season function
@@ -17,7 +18,8 @@ def test_get_season():
 
     date = datetime(2022, 12, 21)
     assert get_season(date) == "winter"
-    
+
+
 def test_model_seasonality():
     """
     Test the model_seasonality function

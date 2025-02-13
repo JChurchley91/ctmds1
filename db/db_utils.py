@@ -5,10 +5,10 @@ import polars
 from db.tables import Strategies, CountryCodes, Granularity, Commodity
 
 TABLES: dict = {
-    "Strategies": Strategies.return_as_df(),
-    "CountryCodes": CountryCodes.return_as_df(),
-    "Granularity": Granularity.return_as_df(),
-    "Commodity": Commodity.return_as_df(),
+    "strategies": Strategies.return_as_df(),
+    "country_codes": CountryCodes.return_as_df(),
+    "granularity": Granularity.return_as_df(),
+    "commodity": Commodity.return_as_df(),
 }
 
 
@@ -62,6 +62,7 @@ def create_table_from_df(
         conn.register("df", df)
         conn.execute(f"DROP TABLE IF EXISTS {table_name}")
         conn.execute(f"CREATE TABLE IF NOT EXISTS {table_name} AS SELECT * FROM df")
+        print(f"Table {table_name} created.")
     except Exception as error:
         typer.echo(f"Error creating table from DataFrame: {error}. Program will exit.")
         raise typer.Exit(code=1)
@@ -77,7 +78,7 @@ def create_config_tables(conn: duckdb.DuckDBPyConnection) -> None:
     try:
         for table_name, df in TABLES.items():
             create_table_from_df(df, table_name, conn)
-            return None
+        return None
     except Exception as error:
         typer.echo(f"Error creating config tables: {error}. Program will exit.")
         raise typer.Exit(code=1)

@@ -107,3 +107,24 @@ def create_config_tables(conn: duckdb.DuckDBPyConnection) -> None:
     except Exception as error:
         typer.echo(f"Error creating config tables: {error}. Program will exit.")
         raise typer.Exit(code=1)
+
+
+def select_duckdb_table(
+    conn: duckdb.DuckDBPyConnection, schema_name: str, table_name: str
+) -> polars.DataFrame:
+    """
+    Select a table from a DuckDB database and return it as a Polars DataFrame.
+
+    :param conn: DuckDB connection to use
+    :param schema_name: Name of the schema to select the table from
+    :param table_name: Name of the table to select
+    :return: Polars DataFrame
+    """
+    try:
+        df = duckdb.sql(
+            connection=conn, query=f"SELECT * FROM {schema_name}.{table_name}"
+        ).pl()
+        return df
+    except Exception as error:
+        typer.echo(f"Error selecting table: {error}. Program will exit.")
+        raise typer.Exit(code=1)

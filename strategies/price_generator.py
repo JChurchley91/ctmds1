@@ -1,9 +1,10 @@
 import numpy as np
 import pytz
+import polars
 
 from datetime import datetime, timedelta
 from numpy import ndarray
-from db.tables import CountryCodes
+from db.db_utils import return_duckdb_conn, select_duckdb_table
 from utils.seasonality import (
     get_season,
     model_seasonality,
@@ -40,6 +41,19 @@ def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
     return int(hours)
 
 
+def get_base_price(country_code: str) -> polars.DataFrame:
+    """
+    Select the base prices from config.country_codes table.
+    Filter the base prices based on the country_code param.
+
+    :return: dict
+    """
+    conn = return_duckdb_conn("price_data.db")
+    df = select_duckdb_table(conn, "config", "country_codes")
+    df = df.filter(polars.col("country_code") == country_code.value)
+    return df
+
+
 def generate_prices(
     for_date: datetime, country_code: str, granularity: str, commodity: str
 ) -> np.ndarray[float]:
@@ -55,8 +69,12 @@ def generate_prices(
     :param commodity: the commodity to return prices for
     :return: None
     """
-
-    base_price = CountryCodes.get_price(country_code)
+    base_price = (
+        get_base_price(country_code)
+        .select("country_base_price")
+        .to_series()
+        .to_list()[0]
+    )
     season = get_season(for_date)
     seasonality_factor = model_seasonality(season, commodity)
     peak_hours = model_peak_hours(season, commodity)

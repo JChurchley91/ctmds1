@@ -20,7 +20,8 @@ class Strategies(str, Enum):
         :return: Polars DataFrame
         """
         data = {"strategy_name": [strategy.value for strategy in cls]}
-        return polars.DataFrame(data)
+        df = polars.DataFrame(data)
+        return df
 
 
 class CountryCodes(str, Enum):
@@ -63,7 +64,8 @@ class CountryCodes(str, Enum):
                 cls.get_price(country_code.value) for country_code in cls
             ],
         }
-        return polars.DataFrame(data)
+        df = polars.DataFrame(data)
+        return df
 
 
 class Granularity(str, Enum):
@@ -94,4 +96,5 @@ class Commodity(str, Enum):
         :return: Polars DataFrame
         """
         data = {"commodity": [commodity.value for commodity in cls]}
-        return polars.DataFrame(data)
+        df = polars.DataFrame(data)
+        return df

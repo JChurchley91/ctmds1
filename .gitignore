@@ -172,3 +172,5 @@ cython_debug/
 
 poetry.lock
 .idea
+test.py
+*.db

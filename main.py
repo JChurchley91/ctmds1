@@ -17,8 +17,9 @@ app = typer.Typer()
 
 def initialise_database(db_name: str = "price_data.db") -> None:
     """
-    Initialise the DuckDB database and create the config schema.
-
+    Initialise the DuckDB database and create the config schema and tables.
+    Note that tbe tables are overwritten each time this function is called.
+    :param db_name: the name of the database to initialise.
 
     :return: None
     """

@@ -16,7 +16,6 @@ def create_duckdb_db(db_name: str) -> bool | None:
     """
     Create a DuckDB database.
 
-
     :param db_name: Name of the database to be created
     :return: None
     """
@@ -72,6 +71,7 @@ def create_table_from_df(
     """
     Create a table in a DuckDB database from a Polars DataFrame.
     Add an ID column to the DataFrame before creating the table.
+    Tables are dropped and recreated if they already exist.
 
     :param df: Polars DataFrame to create a table from
     :param schema_name: Name of the schema to create the table in
@@ -95,6 +95,7 @@ def create_table_from_df(
 def create_config_tables(conn: duckdb.DuckDBPyConnection) -> None:
     """
     Create the base config tables in the DuckDB database.
+    Uses the TABLES dictionary to create the tables.
 
     :param conn: DuckDB connection to use
     :return: None

@@ -3,7 +3,7 @@ import importlib
 import datetime
 
 from typing_extensions import Annotated
-from options import Strategies, CountryCodes, Granularity, Commodity
+from db.tables import Strategies, CountryCodes, Granularity, Commodity
 from utils.timer import log_generation_time
 
 app = typer.Typer()

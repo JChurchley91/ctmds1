@@ -3,7 +3,7 @@ import pytz
 
 from datetime import datetime, timedelta
 from numpy import ndarray
-from options import CountryCodes
+from db.tables import CountryCodes
 from utils.seasonality import (
     get_season,
     model_seasonality,

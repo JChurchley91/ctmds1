@@ -23,7 +23,7 @@ def get_base_price(country_code: str) -> int:
     conn = return_duckdb_conn("price_data.db")
     df = select_duckdb_table(conn, "config", "country_codes")
     base_price = (
-        df.filter(polars.col("country_code") == country_code.value)
+        df.filter(polars.col("country_code") == country_code)
         .select("country_base_price")
         .to_series()
         .to_list()[0]

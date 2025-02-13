@@ -44,14 +44,37 @@ def return_duckdb_conn(db_name: str) -> duckdb.DuckDBPyConnection:
         raise typer.Exit(code=1)
 
 
+def create_config_schema(conn: duckdb.DuckDBPyConnection) -> None:
+    """
+    Create the base config schema in the DuckDB database.
+
+    :param conn: DuckDB connection to use
+    :return: None
+    """
+    try:
+        conn.execute(
+            """
+            CREATE SCHEMA IF NOT EXISTS config;
+            """
+        )
+        return None
+    except Exception as error:
+        typer.echo(f"Error creating config schema: {error}. Program will exit.")
+        raise typer.Exit(code=1)
+
+
 def create_table_from_df(
-    df: polars.DataFrame, table_name: str, conn: duckdb.DuckDBPyConnection
+    df: polars.DataFrame,
+    schema_name: str,
+    table_name: str,
+    conn: duckdb.DuckDBPyConnection,
 ) -> None:
     """
     Create a table in a DuckDB database from a Polars DataFrame.
     Add an ID column to the DataFrame before creating the table.
 
     :param df: Polars DataFrame to create a table from
+    :param schema_name: Name of the schema to create the table in
     :param table_name: Name of the table to create
     :param conn: DuckDB connection to use
     :return: None
@@ -60,9 +83,10 @@ def create_table_from_df(
         df = df.with_columns(polars.Series("id", [i + 1 for i in range(len(df))]))
         df = df.select(["id"] + df.columns[:-1])
         conn.register("df", df)
-        conn.execute(f"DROP TABLE IF EXISTS {table_name}")
-        conn.execute(f"CREATE TABLE IF NOT EXISTS {table_name} AS SELECT * FROM df")
-        print(f"Table {table_name} created.")
+        conn.execute(f"DROP TABLE IF EXISTS {schema_name}.{table_name}")
+        conn.execute(
+            f"CREATE TABLE IF NOT EXISTS {schema_name}.{table_name} AS SELECT * FROM df"
+        )
     except Exception as error:
         typer.echo(f"Error creating table from DataFrame: {error}. Program will exit.")
         raise typer.Exit(code=1)
@@ -77,7 +101,7 @@ def create_config_tables(conn: duckdb.DuckDBPyConnection) -> None:
     """
     try:
         for table_name, df in TABLES.items():
-            create_table_from_df(df, table_name, conn)
+            create_table_from_df(df, "config", table_name, conn)
         return None
     except Exception as error:
         typer.echo(f"Error creating config tables: {error}. Program will exit.")

@@ -3,6 +3,7 @@ import importlib
 import datetime
 
 from typing_extensions import Annotated
+from utils.timer import log_generation_time
 from db.tables import Strategies, CountryCodes, Granularity, Commodity
 from db.db_utils import (
     create_duckdb_db,
@@ -10,7 +11,6 @@ from db.db_utils import (
     create_config_schema,
     create_config_tables,
 )
-from utils.timer import log_generation_time
 
 app = typer.Typer()
 
@@ -38,8 +38,8 @@ def import_strategy_module(strategy_name: str) -> importlib:
     """
     Import the strategy module based on the strategy name.
 
-    :param strategy_name:
-    :return: importlib
+    :param strategy_name: the name of the strategy to import
+    :return: importlib module
     """
     try:
         return importlib.import_module(f"strategies.{strategy_name}")

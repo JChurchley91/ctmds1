@@ -1,4 +1,34 @@
-from datetime import datetime
+import pytz
+
+from datetime import datetime, timedelta
+
+
+def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
+    """
+    Return the number of hours in a day for the specified date and timezone.
+
+    :param date: the date to calculate the number of hours in a day for
+    :param timezone_str: the timezone to calculate the number of hours in a day for
+    :return: an int representing the number of hours in a given day
+    """
+    tz = pytz.timezone(timezone_str)
+
+    if isinstance(date, datetime):
+        date = date.date()
+
+    day_start = datetime(date.year, date.month, date.day)
+    next_day = day_start + timedelta(days=1)
+
+    day_start = tz.localize(day_start)
+    day_start = tz.normalize(day_start)
+
+    next_day = tz.localize(next_day)
+    next_day = tz.normalize(next_day)
+
+    difference = next_day - day_start
+    hours = difference.total_seconds() / 3600
+
+    return int(hours)
 
 
 def get_season(date: datetime) -> str:

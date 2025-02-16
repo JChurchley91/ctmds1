@@ -1,10 +1,11 @@
 import numpy as np
-import pytz
+import polars
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from numpy import ndarray
-from options import CountryCodes
+from db.db_utils import return_duckdb_conn, select_duckdb_table
 from utils.seasonality import (
+    hours_in_day,
     get_season,
     model_seasonality,
     model_peak_hours,
@@ -12,32 +13,22 @@ from utils.seasonality import (
 )
 
 
-def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
+def get_base_price(country_code: str) -> int:
     """
-    Return the number of hours in a day for the specified date and timezone.
+    Select the base prices from config.country_codes table.
+    Filter the base prices based on the country_code param.
 
-    :param date: the date to calculate the number of hours in a day for
-    :param timezone_str: the timezone to calculate the number of hours in a day for
-    :return: an int representing the number of hours in a given day
+    :return: dict
     """
-    tz = pytz.timezone(timezone_str)
-
-    if isinstance(date, datetime):
-        date = date.date()
-
-    day_start = datetime(date.year, date.month, date.day)
-    next_day = day_start + timedelta(days=1)
-
-    day_start = tz.localize(day_start)
-    day_start = tz.normalize(day_start)
-
-    next_day = tz.localize(next_day)
-    next_day = tz.normalize(next_day)
-
-    difference = next_day - day_start
-    hours = difference.total_seconds() / 3600
-
-    return int(hours)
+    conn = return_duckdb_conn("price_data.db")
+    df = select_duckdb_table(conn, "config", "country_codes")
+    base_price = (
+        df.filter(polars.col("country_code") == country_code)
+        .select("country_base_price")
+        .to_series()
+        .to_list()[0]
+    )
+    return base_price
 
 
 def generate_prices(
@@ -55,8 +46,7 @@ def generate_prices(
     :param commodity: the commodity to return prices for
     :return: None
     """
-
-    base_price = CountryCodes.get_price(country_code)
+    base_price = get_base_price(country_code)
     season = get_season(for_date)
     seasonality_factor = model_seasonality(season, commodity)
     peak_hours = model_peak_hours(season, commodity)

@@ -3,18 +3,38 @@ import importlib
 import datetime
 
 from typing_extensions import Annotated
-from options import Strategies, CountryCodes, Granularity, Commodity
 from utils.timer import log_generation_time
+from db.tables import Strategies, CountryCodes, Granularity, Commodity
+from db.db_utils import (
+    create_duckdb_db,
+    return_duckdb_conn,
+    create_config_schema,
+    create_config_tables,
+)
 
 app = typer.Typer()
+
+
+def initialise_database(db_name: str = "price_data.db") -> None:
+    """
+    Initialise the DuckDB database and create the config schema and tables.
+    Note that tbe tables are overwritten each time this function is called.
+    :param db_name: the name of the database to initialise.
+
+    :return: None
+    """
+    create_duckdb_db(db_name)
+    conn = return_duckdb_conn(db_name)
+    create_config_schema(conn)
+    create_config_tables(conn)
 
 
 def import_strategy_module(strategy_name: str) -> importlib:
     """
     Import the strategy module based on the strategy name.
 
-    :param strategy_name:
-    :return: importlib
+    :param strategy_name: the name of the strategy to import
+    :return: importlib module
     """
     try:
         return importlib.import_module(f"strategies.{strategy_name}")
@@ -102,4 +122,5 @@ def model_prices(
 
 
 if __name__ == "__main__":
+    initialise_database()
     app()

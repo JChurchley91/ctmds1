@@ -23,15 +23,10 @@ def initialise_database(db_name: str = "price_data.db") -> None:
 
     :return: None
     """
-    try:
-        create_duckdb_db(db_name)
-        conn = return_duckdb_conn(db_name)
-        create_config_schema(conn)
-        create_config_tables(conn)
-        return None
-    except Exception as error:
-        typer.echo(f"Error initialising database: {error}. Program will exit.")
-        raise typer.Exit(code=1)
+    create_duckdb_db(db_name)
+    conn = return_duckdb_conn(db_name)
+    create_config_schema(conn)
+    create_config_tables(conn)
 
 
 def import_strategy_module(strategy_name: str) -> importlib:

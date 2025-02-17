@@ -5,7 +5,7 @@ from datetime import datetime
 from numpy import ndarray
 from db.utils import return_duckdb_conn, select_duckdb_table
 from modelling.seasonality import (
-    hours_in_day,
+    get_hours_in_day,
     get_season,
     model_seasonality,
     model_peak_hours,
@@ -51,7 +51,7 @@ def model_daily_prices(
     seasonality_factor = model_seasonality(season, commodity)
     peak_hours = model_peak_hours(season, commodity)
     off_peak_hours = model_off_peak_hours(season, commodity)
-    hours_in_for_date = hours_in_day(for_date, "Europe/London")
+    hours_in_for_date = get_hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":
         prices: ndarray = np.random.normal(

@@ -174,3 +174,4 @@ poetry.lock
 .idea
 test.py
 *.db
+*.db.wal

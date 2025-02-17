@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from datetime import datetime
 from pydantic import BaseModel
-from modelling.price_modelling import model_daily_prices
+from modelling.prices import model_daily_prices
 from db.tables import CountryCodes, Granularity, Commodity
 from db.utils import (
     create_duckdb_db,

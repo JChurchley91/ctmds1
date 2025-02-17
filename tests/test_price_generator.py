@@ -4,7 +4,8 @@ import datetime
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from modelling.price_modelling import hours_in_day, model_daily_prices
+from modelling.prices import model_daily_prices
+from modelling.seasonality import hours_in_day
 
 
 def test_hours_in_day():

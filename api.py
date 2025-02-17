@@ -10,7 +10,6 @@ from db.db_utils import (
     create_config_schema,
     create_config_tables,
 )
-from strategies.price_generator import generate_prices
 
 
 def import_strategy_module(strategy_name: str):
@@ -21,8 +20,10 @@ def import_strategy_module(strategy_name: str):
 
 
 def lifespan(fast_api: FastAPI):
+    fast_api.title = "Price Data API"
     initialise_database()
     yield
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -44,6 +45,7 @@ def initialise_database(db_name: str = "price_data.db") -> None:
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
+
 @app.post("/generate-random-numbers")
 def generate_random_numbers(strategy_name: Strategies, number_count: int):
     try:
@@ -56,7 +58,8 @@ def generate_random_numbers(strategy_name: Strategies, number_count: int):
 
 @app.post("/model-prices")
 def model_prices(request: GeneratePricesRequest):
-    prices = generate_prices(
+    strategy_module = import_strategy_module("price_generator")
+    prices = strategy_module.generate_prices(
         request.for_date,
         request.country_code,
         request.granularity,

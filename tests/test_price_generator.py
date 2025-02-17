@@ -4,7 +4,7 @@ import datetime
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from strategies.price_generator import hours_in_day, generate_prices
+from modelling.price_modelling import hours_in_day, model_daily_prices
 
 
 def test_hours_in_day():
@@ -31,10 +31,10 @@ def test_generate_prices():
     granularity = "h"
     commodity = "power"
 
-    assert generate_prices(date, country_code, granularity, commodity) is not None
-    assert len(generate_prices(date, country_code, granularity, commodity)) == 24
+    assert model_daily_prices(date, country_code, granularity, commodity) is not None
+    assert len(model_daily_prices(date, country_code, granularity, commodity)) == 24
 
     granularity = "hh"
 
-    assert generate_prices(date, country_code, granularity, commodity) is not None
-    assert len(generate_prices(date, country_code, granularity, commodity)) == 48
+    assert model_daily_prices(date, country_code, granularity, commodity) is not None
+    assert len(model_daily_prices(date, country_code, granularity, commodity)) == 48

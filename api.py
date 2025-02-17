@@ -1,10 +1,9 @@
-import importlib
-
 from fastapi import FastAPI, HTTPException
 from datetime import datetime
 from pydantic import BaseModel
-from db.tables import Strategies, CountryCodes, Granularity, Commodity
-from db.db_utils import (
+from modelling.price_modelling import model_daily_prices
+from db.tables import CountryCodes, Granularity, Commodity
+from db.utils import (
     create_duckdb_db,
     return_duckdb_conn,
     create_config_schema,
@@ -12,49 +11,32 @@ from db.db_utils import (
 )
 
 
-def import_strategy_module(strategy_name: str):
+def lifespan(fast_api_app, db_name="price_data.db") -> None:  # noqa: F841
     """
-    Import the strategy module based on the strategy name.
-    
-    :param strategy_name: Strategy name
-    :return: importlib module
+    Initialise the database and set the FastAPI title.
+    :param db_name: the name of the database to initialise.
+    :param fast_api_app: The FastAPI instance
+    :return: None
     """
     try:
-        return importlib.import_module(f"strategies.{strategy_name}")
-    except ImportError as error:
+        create_duckdb_db(db_name)
+        conn = return_duckdb_conn(db_name)
+        create_config_schema(conn)
+        create_config_tables(conn)
+        yield
+    except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
 
-def lifespan(fast_api: FastAPI): 
-    """
-    Initialise the database and set the FastAPI title.
-    :param fast_api: The FastAPI instance
-    :return: None
-    """
-    fast_api.title = "Price Data API"
-    initialise_database()
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
-
-
-class GeneratePricesRequest(BaseModel):
-    """
-    Request model for the model_prices endpoint.
-    """
-    for_date: datetime
-    country_code: CountryCodes
-    granularity: Granularity
-    commodity: Commodity
+app = FastAPI(title="Price Data API", lifespan=lifespan)
 
 
 def initialise_database(db_name: str = "price_data.db") -> None:
     """
     Initialise the DuckDB database and create the config schema and tables.
     Note that tbe tables are overwritten each time this function is called.
-    
-    :param db_name: database name
+
+    :param db_name: the name of the database to initialise.
     :return: None
     """
     try:
@@ -67,21 +49,15 @@ def initialise_database(db_name: str = "price_data.db") -> None:
         raise HTTPException(status_code=500, detail=str(error))
 
 
-@app.post("/generate-random-numbers")
-def generate_random_numbers(strategy_name: Strategies, number_count: int) -> dict:
+class GeneratePricesRequest(BaseModel):
     """
-    Generate random numbers using the specified strategy.
-    
-    :param strategy_name: Strategy name
-    :param number_count: Number of random numbers to generate
-    :return: dict of random numbers
+    Request model for the model_prices endpoint.
     """
-    try:
-        strategy_module = import_strategy_module(strategy_name.value)
-        numbers = strategy_module.generate_random_numbers(number_count)
-        return {"random numbers: ": numbers}
-    except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error))
+
+    for_date: datetime
+    country_code: CountryCodes
+    granularity: Granularity
+    commodity: Commodity
 
 
 @app.post("/model-prices")
@@ -91,12 +67,11 @@ def model_prices(request: GeneratePricesRequest) -> dict:
     Maps the country_code param to COUNTRY_CODE_PRICES dictionary to return a base price.
     Uses the base price as a starting point to generate hourly prices for the specified date.
     Uses the seasonality factor and peak hours to adjust the prices accordingly.
-    
+
     :param request: request containing the date, country code, granularity, and commodity
     :return: dict of hourly prices
     """
-    strategy_module = import_strategy_module("price_generator")
-    prices = strategy_module.generate_prices(
+    prices = model_daily_prices(
         request.for_date,
         request.country_code,
         request.granularity,

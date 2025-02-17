@@ -3,8 +3,8 @@ import polars
 
 from datetime import datetime
 from numpy import ndarray
-from db.db_utils import return_duckdb_conn, select_duckdb_table
-from utils.seasonality import (
+from db.utils import return_duckdb_conn, select_duckdb_table
+from modelling.seasonality import (
     hours_in_day,
     get_season,
     model_seasonality,
@@ -31,7 +31,7 @@ def get_base_price(country_code: str) -> int:
     return base_price
 
 
-def generate_prices(
+def model_daily_prices(
     for_date: datetime, country_code: str, granularity: str, commodity: str
 ) -> np.ndarray[float]:
     """

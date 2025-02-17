@@ -84,9 +84,7 @@ def create_table_from_df(
         df = df.select(["id"] + df.columns[:-1])
         conn.register("df", df)
         conn.execute(f"DROP TABLE IF EXISTS {schema_name}.{table_name}")
-        conn.execute(
-            f"CREATE TABLE {schema_name}.{table_name} AS SELECT * FROM df"
-        )
+        conn.execute(f"CREATE TABLE {schema_name}.{table_name} AS SELECT * FROM df")
     except Exception as error:
         typer.echo(f"Error creating table from DataFrame: {error}. Program will exit.")
         raise typer.Exit(code=1)

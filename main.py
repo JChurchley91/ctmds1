@@ -11,9 +11,10 @@ from db.utils import (
 )
 
 
-def lifespan(fast_api_app, db_name="price_data.db") -> None:  # noqa: F841
+def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa: F841
     """
     Initialise the database and set the FastAPI title.
+
     :param db_name: the name of the database to initialise.
     :param fast_api_app: The FastAPI instance
     :return: None
@@ -28,25 +29,7 @@ def lifespan(fast_api_app, db_name="price_data.db") -> None:  # noqa: F841
         raise HTTPException(status_code=500, detail=str(error))
 
 
-app = FastAPI(title="Price Data API", lifespan=lifespan)
-
-
-def initialise_database(db_name: str = "price_data.db") -> None:
-    """
-    Initialise the DuckDB database and create the config schema and tables.
-    Note that tbe tables are overwritten each time this function is called.
-
-    :param db_name: the name of the database to initialise.
-    :return: None
-    """
-    try:
-        create_duckdb_db(db_name)
-        conn = return_duckdb_conn(db_name)
-        create_config_schema(conn)
-        create_config_tables(conn)
-        print(f"{db_name} initialised - schema and tables created.")
-    except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error))
+app = FastAPI(title="Price Data API", lifespan=initialise_database)
 
 
 class GeneratePricesRequest(BaseModel):

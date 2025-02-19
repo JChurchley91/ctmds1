@@ -13,8 +13,9 @@ def get_logger(logger_name: str) -> loguru.logger:
     logger = loguru.logger
     logger.add(
         f"logs/{logger_name}-{today}.log",
-        rotation="1 day",
-        retention="1 day",
+        rotation="1 hour",
+        retention="1 hour",
         level="INFO",
+        mode="w",
     )
     return logger

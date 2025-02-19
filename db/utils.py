@@ -42,7 +42,7 @@ def return_duckdb_conn(db_name: str) -> duckdb.DuckDBPyConnection:
         raise typer.Exit(code=1)
 
 
-def create_config_schema(conn: duckdb.DuckDBPyConnection) -> None:
+def create_schemas(conn: duckdb.DuckDBPyConnection) -> None:
     """
     Create the base config schema in the DuckDB database.
 
@@ -55,37 +55,77 @@ def create_config_schema(conn: duckdb.DuckDBPyConnection) -> None:
             CREATE SCHEMA IF NOT EXISTS config;
             """
         )
+        conn.execute(
+            """
+            CREATE SCHEMA IF NOT EXISTS prices;
+            """
+        )
         return None
     except Exception as error:
-        typer.echo(f"Error creating config schema: {error}. Program will exit.")
+        typer.echo(f"Error creating schemas: {error}. Program will exit.")
         raise typer.Exit(code=1)
 
 
-def create_table_from_df(
+def check_table_exists(
+    table_schema: str, table_name: str, conn: duckdb.DuckDBPyConnection
+) -> bool:
+    """
+    Check if a table exists in a DuckDB database.
+
+    :param table_schema: Schema name of table to check
+    :param table_name: Table name to check
+    :param conn: DuckDB connection to use
+    :return: Boolean
+    """
+    return (
+        True
+        if conn.sql(
+            f"SELECT 1 FROM information_schema.tables "
+            f"WHERE table_schema = '{table_schema}' and table_name = '{table_name}'"
+        )
+        else False
+    )
+
+
+def create_or_append_table_from_df(
     df: polars.DataFrame,
+    mode: str,
     schema_name: str,
     table_name: str,
     conn: duckdb.DuckDBPyConnection,
 ) -> None:
     """
-    Create a table in a DuckDB database from a Polars DataFrame.
-    Add an ID column to the DataFrame before creating the table.
-    Tables are dropped and recreated if they already exist.
+    Create or append a table from a Polars DataFrame in a DuckDB database.
+    Checks if the table exists before creating or appending.
 
-    :param df: Polars DataFrame to create a table from
-    :param schema_name: Name of the schema to create the table in
-    :param table_name: Name of the table to create
+    :param df: DataFrame to create or append the table from
+    :param mode: Mode to use when creating the table (append or create)
+    :param schema_name: Schema name of table to create or append into
+    :param table_name: Table name to create or append into
     :param conn: DuckDB connection to use
     :return: None
     """
-    try:
-        df = df.with_columns(polars.Series("id", [i + 1 for i in range(len(df))]))
-        df = df.select(["id"] + df.columns[:-1])
-        conn.register("df", df)
-        conn.execute(f"DROP TABLE IF EXISTS {schema_name}.{table_name}")
-        conn.execute(f"CREATE TABLE {schema_name}.{table_name} AS SELECT * FROM df")
-    except Exception as error:
-        typer.echo(f"Error creating table from DataFrame: {error}. Program will exit.")
+    if mode in ("append", "create"):
+        try:
+            df = df.with_columns(polars.Series("id", [i + 1 for i in range(len(df))]))
+            df = df.select(["id"] + df.columns[:-1])
+            conn.register("df", df)
+
+            if mode == "append" and check_table_exists(schema_name, table_name, conn):
+                conn.execute(f"INSERT INTO {schema_name}.{table_name} SELECT * FROM df")
+            else:
+                conn.execute(f"DROP TABLE IF EXISTS {schema_name}.{table_name}")
+                conn.execute(
+                    f"CREATE TABLE {schema_name}.{table_name} AS SELECT * FROM df"
+                )
+
+        except Exception as error:
+            typer.echo(
+                f"Error creating table from DataFrame: {error}. Program will exit."
+            )
+            raise typer.Exit(code=1)
+    else:
+        typer.echo(f"Invalid mode: {mode}. Program will exit.")
         raise typer.Exit(code=1)
 
 
@@ -99,7 +139,7 @@ def create_config_tables(conn: duckdb.DuckDBPyConnection) -> None:
     """
     try:
         for table_name, df in TABLES.items():
-            create_table_from_df(df, "config", table_name, conn)
+            create_or_append_table_from_df(df, "create", "config", table_name, conn)
         return None
     except Exception as error:
         typer.echo(f"Error creating config tables: {error}. Program will exit.")
@@ -125,12 +165,3 @@ def select_duckdb_table(
     except Exception as error:
         typer.echo(f"Error selecting table: {error}. Program will exit.")
         raise typer.Exit(code=1)
-
-
-def create_daily_prices_table(conn: duckdb.DuckDBPyConnection) -> None:
-    """
-    Create the daily_prices table in the DuckDB database.
-
-    :return: None
-    """
-    pass

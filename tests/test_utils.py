@@ -11,6 +11,8 @@ from db.utils import (
     create_schemas,
     create_or_append_table_from_df,
     select_duckdb_table,
+    check_table_exists,
+    create_config_tables
 )
 
 
@@ -42,7 +44,7 @@ def test_return_duckdb_conn():
     assert conn is not None
 
 
-def test_create_config_schema():
+def test_create_schemas():
     """
     Test the create_config_schema function.
     Select 1 if the config schema exists in the DuckDB database.
@@ -56,7 +58,7 @@ def test_create_config_schema():
     assert schema_exists == (1,)
 
 
-def test_create_table_from_df():
+def test_create_or_append_table_from_df():
     """
     Test the create_table_from_df function.
     Create a Polars DataFrame with a single column.
@@ -85,3 +87,31 @@ def test_select_duckdb_table():
     create_or_append_table_from_df(df, "create", "config", "test_table", conn)
     selected_df = select_duckdb_table(conn, "config", "test_table")
     assert selected_df.shape[0] == 3
+
+def test_check_table_exists():
+    """
+    Test the check_table_exists function.
+    Create a table in the DuckDB database.
+    Check if the table exists.
+    Assert that the function returns True.
+    """
+    conn = return_duckdb_conn("test.db")
+    conn.execute("CREATE TABLE test_table (col1 INT)")
+    table_exists = check_table_exists("config", "test_table", conn)
+    assert table_exists is True
+    
+def test_create_config_tables():
+    """
+    Test the create_config_tables function.
+    Create a DuckDB connection.
+    Create the config schema.
+    Create the config tables.
+    Assert that the tables are created in the DuckDB database.
+    """
+    conn = return_duckdb_conn("test.db")
+    create_schemas(conn)
+    create_config_tables(conn)
+    table_exists = conn.sql(
+        "SELECT 1 FROM information_schema.tables WHERE table_name = 'country_codes'"
+    ).fetchone()
+    assert table_exists == (1,)

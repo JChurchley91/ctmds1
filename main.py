@@ -31,6 +31,7 @@ def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa:
         create_config_tables(conn)
         logger.info(f"Database initialised - {db_name}")
         yield
+        conn.close()
     except Exception as error:
         logger.error(f"Error initialising database - {error}")
         raise HTTPException(status_code=500, detail=str(error))

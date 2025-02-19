@@ -37,7 +37,7 @@ app = FastAPI(title="Price Data API", lifespan=initialise_database)
 
 @app.post("/model-prices")
 @logger.catch
-def model_prices(request: GeneratePricesRequest) -> dict:
+def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
     """
     Return hourly prices for the specified date and country code.
     Maps the country_code param to COUNTRY_CODE_PRICES dictionary to return a base price.
@@ -45,7 +45,7 @@ def model_prices(request: GeneratePricesRequest) -> dict:
     Uses the seasonality factor and peak hours to adjust the prices accordingly.
 
     :param request: request containing the date, country code, granularity, and commodity
-    :return: dict of hourly prices
+    :return: response containing the date, country code, granularity, commodity, and prices
     """
     logger.info(f"request: {request}")
     prices = model_daily_prices(

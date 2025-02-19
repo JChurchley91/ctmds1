@@ -8,8 +8,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from db.utils import (
     create_duckdb_db,
     return_duckdb_conn,
-    create_config_schema,
-    create_table_from_df,
+    create_schemas,
+    create_or_append_table_from_df,
     select_duckdb_table,
 )
 
@@ -49,7 +49,7 @@ def test_create_config_schema():
     Assert that the function creates the config schema in the DuckDB database.
     """
     conn = return_duckdb_conn("test.db")
-    create_config_schema(conn)
+    create_schemas(conn)
     schema_exists = conn.sql(
         "SELECT 1 FROM information_schema.schemata WHERE schema_name = 'config'"
     ).fetchone()
@@ -65,7 +65,7 @@ def test_create_table_from_df():
     """
     conn = return_duckdb_conn("test.db")
     df = polars.DataFrame({"col1": [1, 2, 3]})
-    create_table_from_df(df, "config", "test_table", conn)
+    create_or_append_table_from_df(df, "create", "config", "test_table", conn)
     table_exists = conn.sql(
         "SELECT 1 FROM information_schema.tables WHERE table_name = 'test_table'"
     ).fetchone()
@@ -82,6 +82,6 @@ def test_select_duckdb_table():
     """
     conn = return_duckdb_conn("test.db")
     df = polars.DataFrame({"col1": [1, 2, 3]})
-    create_table_from_df(df, "config", "test_table", conn)
+    create_or_append_table_from_df(df, "create", "config", "test_table", conn)
     selected_df = select_duckdb_table(conn, "config", "test_table")
     assert selected_df.shape[0] == 3

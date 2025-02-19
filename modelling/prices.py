@@ -1,11 +1,11 @@
 import numpy as np
 import polars
+import datetime
 
-from datetime import datetime
 from numpy import ndarray
-from db.db_utils import return_duckdb_conn, select_duckdb_table
-from utils.seasonality import (
-    hours_in_day,
+from db.utils import return_duckdb_conn, select_duckdb_table
+from modelling.seasonality import (
+    get_hours_in_day,
     get_season,
     model_seasonality,
     model_peak_hours,
@@ -31,8 +31,11 @@ def get_base_price(country_code: str) -> int:
     return base_price
 
 
-def generate_prices(
-    for_date: datetime, country_code: str, granularity: str, commodity: str
+def model_daily_prices(
+    for_date: datetime.datetime,
+    country_code: str,
+    granularity: str,
+    commodity: str,
 ) -> np.ndarray[float]:
     """
     Return hourly prices for the specified date and country code.
@@ -51,7 +54,7 @@ def generate_prices(
     seasonality_factor = model_seasonality(season, commodity)
     peak_hours = model_peak_hours(season, commodity)
     off_peak_hours = model_off_peak_hours(season, commodity)
-    hours_in_for_date = hours_in_day(for_date, "Europe/London")
+    hours_in_for_date = get_hours_in_day(for_date, "Europe/London")
 
     if granularity == "h":
         prices: ndarray = np.random.normal(
@@ -59,7 +62,8 @@ def generate_prices(
         )
         prices[peak_hours] += 20
         prices[off_peak_hours] -= 40
-        return np.round(prices, 2)
+        prices = np.round(prices, 2)
+        return prices
 
     if granularity == "hh":
         prices: ndarray = np.random.normal(
@@ -67,6 +71,7 @@ def generate_prices(
         )
         prices[peak_hours] += 20
         prices[off_peak_hours] -= 40
-        return np.round(prices, 2)
+        prices = np.round(prices, 2)
+        return prices
     else:
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")

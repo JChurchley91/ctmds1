@@ -3,27 +3,6 @@ from enum import Enum
 import polars
 
 
-class Strategies(str, Enum):
-    """
-    Enum class for the different strategies available to generate random numbers.
-    """
-
-    basic = "basic_generator"
-    numpy = "numpy_generator"
-    prices = "price_generator"
-
-    @classmethod
-    def return_as_df(cls) -> polars.DataFrame:
-        """
-        Return a Polars DataFrame containing the available strategies.
-
-        :return: Polars DataFrame
-        """
-        data = {"strategy_name": [strategy.value for strategy in cls]}
-        df = polars.DataFrame(data)
-        return df
-
-
 class CountryCodes(str, Enum):
     """
     Enum class for the different country codes available.

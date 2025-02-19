@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.seasonality import (
+from modelling.seasonality import (
     get_season,
     model_seasonality,
     model_peak_hours,

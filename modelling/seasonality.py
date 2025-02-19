@@ -3,7 +3,7 @@ import pytz
 from datetime import datetime, timedelta
 
 
-def hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
+def get_hours_in_day(date: datetime, timezone_str: str = "UTC") -> int:
     """
     Return the number of hours in a day for the specified date and timezone.
 

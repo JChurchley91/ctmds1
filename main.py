@@ -1,126 +1,65 @@
-import typer
-import importlib
-import datetime
-
-from typing_extensions import Annotated
-from utils.timer import log_generation_time
-from db.tables import Strategies, CountryCodes, Granularity, Commodity
-from db.db_utils import (
+from utils.logger import get_logger
+from fastapi import FastAPI, HTTPException
+from models.requests import GeneratePricesRequest
+from models.responses import GeneratePricesResponse
+from modelling.prices import model_daily_prices
+from db.utils import (
     create_duckdb_db,
     return_duckdb_conn,
     create_config_schema,
     create_config_tables,
 )
 
-app = typer.Typer()
 
-
-def initialise_database(db_name: str = "price_data.db") -> None:
+def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa: F841
     """
-    Initialise the DuckDB database and create the config schema and tables.
-    Note that tbe tables are overwritten each time this function is called.
+    Initialise the database and set the FastAPI title.
+
     :param db_name: the name of the database to initialise.
-
-    :return: None
-    """
-    create_duckdb_db(db_name)
-    conn = return_duckdb_conn(db_name)
-    create_config_schema(conn)
-    create_config_tables(conn)
-
-
-def import_strategy_module(strategy_name: str) -> importlib:
-    """
-    Import the strategy module based on the strategy name.
-
-    :param strategy_name: the name of the strategy to import
-    :return: importlib module
-    """
-    try:
-        return importlib.import_module(f"strategies.{strategy_name}")
-    except ImportError as error:
-        typer.echo(f"Error importing strategy: {error}. Program will exit.")
-        raise typer.Exit(code=1)
-
-
-@app.command()
-def generate_random_numbers(
-    strategy_name: Annotated[
-        Strategies,
-        typer.Option(help="The strategy to use when generating random numbers"),
-    ],
-    number_count: Annotated[
-        int, typer.Option(help="The number of random numbers to be generated")
-    ],
-) -> None:
-    """
-    Generate random numbers using the specified strategy.
-
-    :param strategy_name: the strategy to use when generating random numbers
-    :param number_count: the number of random numbers to be generated
+    :param fast_api_app: The FastAPI instance
     :return: None
     """
     try:
-        strategy_module = import_strategy_module(strategy_name)
-        start_time = datetime.datetime.now()
-        strategy_module.generate_random_numbers(number_count)
-        finish_time = datetime.datetime.now()
-        time_difference = log_generation_time(start_time, finish_time)
-        typer.echo(f"{number_count} numbers generated in {time_difference} seconds.")
-
+        create_duckdb_db(db_name)
+        conn = return_duckdb_conn(db_name)
+        create_config_schema(conn)
+        create_config_tables(conn)
+        logger.info(f"Database initialised - {db_name}")
+        yield
     except Exception as error:
-        typer.echo(f"Error generating random numbers: {error}. Program will exit.")
-        raise typer.Exit(code=1)
+        logger.error(f"Error initialising database - {error}")
+        raise HTTPException(status_code=500, detail=str(error))
 
 
-@app.command()
-def model_prices(
-    for_date: Annotated[
-        datetime.datetime, typer.Option(help="The date in which to return prices for")
-    ],
-    country_code: Annotated[
-        CountryCodes,
-        typer.Option(help="The country code of the country to return prices for"),
-    ],
-    granularity: Annotated[
-        Granularity, typer.Option(help="The granularity of the prices to be returned")
-    ],
-    commodity: Annotated[
-        Commodity, typer.Option(help="The commodity to return prices for")
-    ],
-) -> None:
+logger = get_logger("daily-prices")
+app = FastAPI(title="Price Data API", lifespan=initialise_database)
+
+
+@app.post("/model-prices")
+@logger.catch
+def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
     """
-    Return prices for the specified date, country code, and granularity.
+    Return hourly prices for the specified date and country code.
+    Maps the country_code param to COUNTRY_CODE_PRICES dictionary to return a base price.
+    Uses the base price as a starting point to generate hourly prices for the specified date.
+    Uses the seasonality factor and peak hours to adjust the prices accordingly.
 
-    :param for_date: the date to model prices for
-    :param country_code: the country code of the country to model prices for
-    :param granularity: the granularity of the prices
-    :param commodity: the commodity to model prices for
-    :return: None
+    :param request: request containing the date, country code, granularity, and commodity
+    :return: response containing the date, country code, granularity, commodity, and prices
     """
-    strategy_module = import_strategy_module("price_generator")
-    prices = strategy_module.generate_prices(
-        for_date, country_code, granularity, commodity
+    logger.info(f"request: {request}")
+    prices = model_daily_prices(
+        request.for_date,
+        request.country_code,
+        request.granularity,
+        request.commodity,
     )
-
-    typer.echo(
-        f"{commodity.value} price data for {for_date.date()} in {country_code.value} ({granularity.value}):"
+    response = GeneratePricesResponse(
+        commodity=request.commodity,
+        date=request.for_date,
+        country_code=request.country_code,
+        granularity=request.granularity,
+        prices=prices.tolist(),
     )
-
-    for index, price in enumerate(prices):
-        if granularity == "h":
-            time = for_date.replace(hour=index, minute=0, second=0, microsecond=0)
-            typer.echo(f"{time.time()} - {price}")
-        if granularity == "hh":
-            time = for_date.replace(
-                hour=index // 2,
-                minute=(index % 2) * 30,
-                second=0,
-                microsecond=0,
-            )
-            typer.echo(f"{time.time()} - {price}")
-
-
-if __name__ == "__main__":
-    initialise_database()
-    app()
+    logger.info(f"response: {response}")
+    return response.model_dump()

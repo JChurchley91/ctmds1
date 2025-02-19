@@ -65,7 +65,8 @@ def model_daily_prices(
         )
         prices[peak_hours] += 20
         prices[off_peak_hours] -= 40
-        return np.round(prices, 2)
+        prices = np.round(prices, 2)
+        return prices
 
     if granularity == "hh":
         prices: ndarray = np.random.normal(
@@ -73,7 +74,8 @@ def model_daily_prices(
         )
         prices[peak_hours] += 20
         prices[off_peak_hours] -= 40
-        return np.round(prices, 2)
+        prices = np.round(prices, 2)
+        return prices
     else:
         logger.error("Invalid granularity: {granularity}. Program will exit.")
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")

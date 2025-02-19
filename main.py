@@ -1,6 +1,7 @@
-from utils.logger import get_logger, log_request
+from utils.logger import get_logger
 from fastapi import FastAPI, HTTPException
 from models.requests import GeneratePricesRequest
+from models.responses import GeneratePricesResponse
 from modelling.prices import model_daily_prices
 from db.utils import (
     create_duckdb_db,
@@ -45,7 +46,6 @@ def model_prices(request: GeneratePricesRequest) -> dict:
     :param request: request containing the date, country code, granularity, and commodity
     :return: dict of hourly prices
     """
-    log_request(logger, request)
     prices = model_daily_prices(
         logger,
         request.for_date,
@@ -53,10 +53,11 @@ def model_prices(request: GeneratePricesRequest) -> dict:
         request.granularity,
         request.commodity,
     )
-    return {
-        "commodity": request.commodity.value,
-        "date": request.for_date.date(),
-        "country_code": request.country_code.value,
-        "granularity": request.granularity.value,
-        "prices": prices.tolist(),
-    }
+    response = GeneratePricesResponse(
+        commodity=request.commodity,
+        date=request.for_date,
+        country_code=request.country_code,
+        granularity=request.granularity,
+        prices=prices.tolist(),
+    )
+    return response.model_dump()

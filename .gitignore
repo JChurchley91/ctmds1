@@ -175,3 +175,4 @@ poetry.lock
 test.py
 *.db
 *.db.wal
+logs/*.log

@@ -1,8 +1,7 @@
+from utils.logger import get_logger, log_request
 from fastapi import FastAPI, HTTPException
-from datetime import datetime
-from pydantic import BaseModel
+from models.requests import GeneratePricesRequest
 from modelling.prices import model_daily_prices
-from db.tables import CountryCodes, Granularity, Commodity
 from db.utils import (
     create_duckdb_db,
     return_duckdb_conn,
@@ -26,24 +25,16 @@ def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa:
         create_config_tables(conn)
         yield
     except Exception as error:
+        logger.error(f"Error initialising database - {error}")
         raise HTTPException(status_code=500, detail=str(error))
 
 
+logger = get_logger("daily-prices")
 app = FastAPI(title="Price Data API", lifespan=initialise_database)
 
 
-class GeneratePricesRequest(BaseModel):
-    """
-    Request model for the model_prices endpoint.
-    """
-
-    for_date: datetime
-    country_code: CountryCodes
-    granularity: Granularity
-    commodity: Commodity
-
-
 @app.post("/model-prices")
+@logger.catch
 def model_prices(request: GeneratePricesRequest) -> dict:
     """
     Return hourly prices for the specified date and country code.
@@ -54,7 +45,9 @@ def model_prices(request: GeneratePricesRequest) -> dict:
     :param request: request containing the date, country code, granularity, and commodity
     :return: dict of hourly prices
     """
+    log_request(logger, request)
     prices = model_daily_prices(
+        logger,
         request.for_date,
         request.country_code,
         request.granularity,

@@ -12,7 +12,7 @@ from db.utils import (
     create_or_append_table_from_df,
     select_duckdb_table,
     check_table_exists,
-    create_config_tables
+    create_config_tables,
 )
 
 
@@ -88,6 +88,7 @@ def test_select_duckdb_table():
     selected_df = select_duckdb_table(conn, "config", "test_table")
     assert selected_df.shape[0] == 3
 
+
 def test_check_table_exists():
     """
     Test the check_table_exists function.
@@ -99,7 +100,8 @@ def test_check_table_exists():
     conn.execute("CREATE TABLE test_table (col1 INT)")
     table_exists = check_table_exists("config", "test_table", conn)
     assert table_exists is True
-    
+
+
 def test_create_config_tables():
     """
     Test the create_config_tables function.

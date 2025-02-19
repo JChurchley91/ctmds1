@@ -4,6 +4,7 @@ import datetime
 
 from numpy import ndarray
 from db.utils import return_duckdb_conn, select_duckdb_table
+from models.responses import GeneratePricesResponse
 from modelling.seasonality import (
     get_hours_in_day,
     get_season,
@@ -60,8 +61,8 @@ def model_daily_prices(
         prices: ndarray = np.random.normal(
             loc=base_price * seasonality_factor, scale=5, size=hours_in_for_date
         )
-        prices[peak_hours] += 20
-        prices[off_peak_hours] -= 40
+        prices[peak_hours] += 10
+        prices[off_peak_hours] -= 10
         prices = np.round(prices, 2)
         return prices
 
@@ -69,9 +70,28 @@ def model_daily_prices(
         prices: ndarray = np.random.normal(
             loc=base_price, scale=5, size=(hours_in_for_date * 2)
         )
-        prices[peak_hours] += 20
-        prices[off_peak_hours] -= 40
+        prices[peak_hours] += 10
+        prices[off_peak_hours] -= 10
         prices = np.round(prices, 2)
         return prices
     else:
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")
+
+
+def build_daily_prices_df(prices_response: GeneratePricesResponse) -> polars.DataFrame:
+    """
+    Build a polars dataframe from a GeneratePricesResponse object.
+
+    :param prices_response: the GeneratePricesResponse object to build the dataframe from
+    :return: polars.DataFrame
+    """
+    df = polars.DataFrame(
+        {
+            "date": [prices_response.date],
+            "country_code": [prices_response.country_code],
+            "commodity": [prices_response.commodity],
+            "granularity": [prices_response.granularity],
+            "prices": [prices_response.prices],
+        }
+    )
+    return df

@@ -2,12 +2,13 @@ from utils.logger import get_logger
 from fastapi import FastAPI, HTTPException
 from models.requests import GeneratePricesRequest
 from models.responses import GeneratePricesResponse
-from modelling.prices import model_daily_prices
+from modelling.prices import model_daily_prices, build_daily_prices_df
 from db.utils import (
     create_duckdb_db,
     return_duckdb_conn,
     create_config_schema,
     create_config_tables,
+    create_daily_prices_table,
 )
 
 
@@ -24,6 +25,7 @@ def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa:
         conn = return_duckdb_conn(db_name)
         create_config_schema(conn)
         create_config_tables(conn)
+        create_daily_prices_table(conn)
         logger.info(f"Database initialised - {db_name}")
         yield
     except Exception as error:
@@ -62,4 +64,6 @@ def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
         prices=prices.tolist(),
     )
     logger.info(f"response: {response}")
+    df = build_daily_prices_df(response)
+    print(df)
     return response.model_dump()

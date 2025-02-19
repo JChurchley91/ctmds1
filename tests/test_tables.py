@@ -13,10 +13,10 @@ def test_country_codes():
     Assert that the enum also returns a Polars DataFrame containing the correct size df.
     :return: None
     """
-    assert type(CountryCodes.get_price("GB")) == int
-    assert type(CountryCodes.get_price("FR")) == int
-    assert type(CountryCodes.get_price("NL")) == int
-    assert type(CountryCodes.get_price("DE")) == int
+    assert type(CountryCodes.get_price("GB")) is int
+    assert type(CountryCodes.get_price("FR")) is int
+    assert type(CountryCodes.get_price("NL")) is int
+    assert type(CountryCodes.get_price("DE")) is int
     assert CountryCodes.return_as_df().shape[0] == 4
 
 

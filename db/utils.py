@@ -125,3 +125,12 @@ def select_duckdb_table(
     except Exception as error:
         typer.echo(f"Error selecting table: {error}. Program will exit.")
         raise typer.Exit(code=1)
+
+
+def create_daily_prices_table(conn: duckdb.DuckDBPyConnection) -> None:
+    """
+    Create the daily_prices table in the DuckDB database.
+
+    :return: None
+    """
+    pass

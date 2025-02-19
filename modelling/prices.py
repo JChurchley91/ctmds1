@@ -1,6 +1,5 @@
 import numpy as np
 import polars
-import loguru
 import datetime
 
 from numpy import ndarray
@@ -33,7 +32,6 @@ def get_base_price(country_code: str) -> int:
 
 
 def model_daily_prices(
-    logger: loguru.logger,
     for_date: datetime.datetime,
     country_code: str,
     granularity: str,
@@ -45,7 +43,6 @@ def model_daily_prices(
     Uses the base price as a starting point to generate hourly prices for the specified date.
     Uses the seasonality factor and peak hours to adjust the prices accordingly.
 
-    :param logger: loguru logger
     :param for_date: the date to return hourly prices for
     :param country_code: the country code of the country to return hourly prices for
     :param granularity: the granularity of the prices to be returned
@@ -77,5 +74,4 @@ def model_daily_prices(
         prices = np.round(prices, 2)
         return prices
     else:
-        logger.error("Invalid granularity: {granularity}. Program will exit.")
         raise ValueError(f"Invalid granularity: {granularity}. Program will exit.")

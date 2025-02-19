@@ -24,6 +24,7 @@ def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa:
         conn = return_duckdb_conn(db_name)
         create_config_schema(conn)
         create_config_tables(conn)
+        logger.info(f"Database initialised - {db_name}")
         yield
     except Exception as error:
         logger.error(f"Error initialising database - {error}")
@@ -46,8 +47,8 @@ def model_prices(request: GeneratePricesRequest) -> dict:
     :param request: request containing the date, country code, granularity, and commodity
     :return: dict of hourly prices
     """
+    logger.info(f"request: {request}")
     prices = model_daily_prices(
-        logger,
         request.for_date,
         request.country_code,
         request.granularity,
@@ -60,4 +61,5 @@ def model_prices(request: GeneratePricesRequest) -> dict:
         granularity=request.granularity,
         prices=prices.tolist(),
     )
+    logger.info(f"response: {response}")
     return response.model_dump()

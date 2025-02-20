@@ -77,7 +77,7 @@ def model_daily_prices(
 
     if granularity == "h":
         prices: ndarray = np.random.normal(
-            loc=base_price-(seasonality_factor + country_commodity_mix_factor),
+            loc=base_price - (seasonality_factor + country_commodity_mix_factor),
             scale=5,
             size=hours_in_for_date,
         )

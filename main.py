@@ -83,7 +83,7 @@ def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
         request.commodity,
     )
 
-    # check if historic price 
+    # check if historic price
     if not historic_price.is_empty():
         logger.info("historic_prices exist: returning historic prices")
         prices = historic_price.select("prices").to_series().to_list()[0]

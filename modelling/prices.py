@@ -32,6 +32,23 @@ def get_base_price(country_code: str) -> int:
     return base_price
 
 
+def get_country_energy_mix(country_code: str, commodity: str) -> float:
+    """
+    Select the country energy mix from config.country_energy_mix table.
+    Filter the country energy mix based on the country_code param.
+    Select the commodity using the commodity param.
+    :param country_code: country code to filter the df on
+    :param commodity: commodity to filter the df on
+    :return: energy mix for given country and commodity
+    """
+    conn = return_duckdb_conn("price_data.db")
+    df = select_duckdb_table(conn, "config", "country_energy_mix")
+    df = df.filter(polars.col("country_code") == country_code)
+    df = df.select(commodity)
+    energy_mix = df.to_series().to_list()[0]
+    return energy_mix
+
+
 def model_daily_prices(
     for_date: datetime.datetime,
     country_code: str,
@@ -56,10 +73,13 @@ def model_daily_prices(
     peak_hours = model_peak_hours(season, commodity)
     off_peak_hours = model_off_peak_hours(season, commodity)
     hours_in_for_date = get_hours_in_day(for_date, "Europe/London")
+    country_commodity_mix_factor = get_country_energy_mix(country_code, commodity)
 
     if granularity == "h":
         prices: ndarray = np.random.normal(
-            loc=base_price * seasonality_factor, scale=5, size=hours_in_for_date
+            loc=base_price-(seasonality_factor + country_commodity_mix_factor),
+            scale=5,
+            size=hours_in_for_date,
         )
         prices[peak_hours] += 10
         prices[off_peak_hours] -= 10

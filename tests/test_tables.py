@@ -39,7 +39,7 @@ def test_commodity():
     Assert that the enum also returns a Polars DataFrame containing the correct size df.
     :return: None
     """
-    assert Commodity.power == "power"
+    assert Commodity.wind == "wind"
     assert Commodity.natural_gas == "natural_gas"
-    assert Commodity.crude == "crude"
-    assert Commodity.return_as_df().shape[0] == 3
+    assert Commodity.solar == "solar"
+    assert Commodity.return_as_df().shape[0] == 6

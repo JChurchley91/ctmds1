@@ -2,12 +2,13 @@ import duckdb
 import typer
 import polars
 
-from db.tables import CountryCodes, Granularity, Commodity
+from db.tables import CountryCodes, Granularity, Commodity, CountryEnergyMix
 
 TABLES: dict = {
     "country_codes": CountryCodes.return_as_df(),
     "granularity": Granularity.return_as_df(),
     "commodity": Commodity.return_as_df(),
+    "country_energy_mix": CountryEnergyMix.return_as_df(),
 }
 
 

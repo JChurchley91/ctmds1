@@ -55,7 +55,7 @@ def check_if_daily_price_exists(
     df = df.filter(polars.col("country_code") == country_code)
     df = df.filter(polars.col("granularity") == granularity)
     df = df.filter(polars.col("commodity") == commodity)
-    return df if not df.is_empty() else None
+    return df if not df.is_empty() else polars.DataFrame()
 
 
 logger = get_logger("daily-prices")
@@ -83,6 +83,7 @@ def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
         request.commodity,
     )
 
+    # check if historic price 
     if not historic_price.is_empty():
         logger.info("historic_prices exist: returning historic prices")
         prices = historic_price.select("prices").to_series().to_list()[0]

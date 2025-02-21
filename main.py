@@ -37,7 +37,7 @@ def initialise_database(fast_api_app, db_name="price_data.db") -> None:  # noqa:
         raise HTTPException(status_code=500, detail=str(error))
 
 
-def check_if_daily_price_exists(
+def get_historic_daily_price(
     for_date: datetime, country_code: str, granularity: str, commodity: str
 ) -> polars.DataFrame:
     """
@@ -51,10 +51,12 @@ def check_if_daily_price_exists(
     """
     conn = return_duckdb_conn("price_data.db")
     df = select_duckdb_table(conn, "prices", "daily_prices")
-    df = df.filter(polars.col("date") == for_date)
-    df = df.filter(polars.col("country_code") == country_code)
-    df = df.filter(polars.col("granularity") == granularity)
-    df = df.filter(polars.col("commodity") == commodity)
+    df = df.filter(
+        date=for_date,
+        country_code=country_code,
+        granularity=granularity,
+        commodity=commodity,
+    )
     return df if not df.is_empty() else polars.DataFrame()
 
 
@@ -76,14 +78,13 @@ def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
     """
     logger.info(f"request: {request}")
 
-    historic_price = check_if_daily_price_exists(
+    historic_price = get_historic_daily_price(
         request.for_date,
         request.country_code,
         request.granularity,
         request.commodity,
     )
 
-    # check if historic price
     if not historic_price.is_empty():
         logger.info("historic_prices exist: returning historic prices")
         prices = historic_price.select("prices").to_series().to_list()[0]

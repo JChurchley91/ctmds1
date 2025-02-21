@@ -133,29 +133,19 @@ class CountryEnergyMix(str, Enum):
 
         :return: Polars DataFrame
         """
-        data = {
-            "country_code": [country_code.value for country_code in cls],
-            "wind": [
-                cls.get_energy_mix(country_code.value, "wind") for country_code in cls
-            ],
-            "natural_gas": [
-                cls.get_energy_mix(country_code.value, "natural_gas")
+        data = {"country_code": [country_code.value for country_code in cls]}
+
+        for power_source in [
+            "wind",
+            "natural_gas",
+            "nuclear",
+            "solar",
+            "hydro",
+            "biofuel",
+        ]:
+            data[power_source] = [
+                cls.get_energy_mix(country_code.value, power_source)
                 for country_code in cls
-            ],
-            "nuclear": [
-                cls.get_energy_mix(country_code.value, "nuclear")
-                for country_code in cls
-            ],
-            "solar": [
-                cls.get_energy_mix(country_code.value, "solar") for country_code in cls
-            ],
-            "hydro": [
-                cls.get_energy_mix(country_code.value, "hydro") for country_code in cls
-            ],
-            "biofuel": [
-                cls.get_energy_mix(country_code.value, "biofuel")
-                for country_code in cls
-            ],
-        }
+            ]
         df = polars.DataFrame(data)
         return df

@@ -108,7 +108,7 @@ def create_or_append_table_from_df(
     """
     if mode in ("append", "create"):
         try:
-            df = df.with_columns(polars.Series("id", [i + 1 for i in range(len(df))]))
+            df = df.with_columns(polars.Series("id", range(1, len(df) + 1)))
             df = df.select(["id"] + df.columns[:-1])
             conn.register("df", df)
 

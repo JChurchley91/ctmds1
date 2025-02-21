@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from db.tables import CountryCodes, Granularity, Commodity
 
+
 @pytest.mark.order(3)
 def test_country_codes():
     """
@@ -20,6 +21,7 @@ def test_country_codes():
     assert type(CountryCodes.get_price("DE")) is int
     assert CountryCodes.return_as_df().shape[0] == 4
 
+
 @pytest.mark.order(4)
 def test_granularity():
     """
@@ -31,6 +33,7 @@ def test_granularity():
     assert Granularity.h == "h"
     assert Granularity.hh == "hh"
     assert Granularity.return_as_df().shape[0] == 2
+
 
 @pytest.mark.order(5)
 def test_commodities():

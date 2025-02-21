@@ -25,6 +25,7 @@ def teardown_session():
     if os.path.exists("test.db"):
         os.remove("test.db")
 
+
 @pytest.mark.order(7)
 def test_create_duckdb_db():
     """
@@ -34,6 +35,7 @@ def test_create_duckdb_db():
     conn = create_duckdb_db("test.db")
     assert conn is True
 
+
 @pytest.mark.order(8)
 def test_return_duckdb_conn():
     """
@@ -42,6 +44,7 @@ def test_return_duckdb_conn():
     """
     conn = return_duckdb_conn("test.db")
     assert conn is not None
+
 
 @pytest.mark.order(9)
 def test_create_schemas():
@@ -56,6 +59,7 @@ def test_create_schemas():
         "SELECT 1 FROM information_schema.schemata WHERE schema_name = 'config'"
     ).fetchone()
     assert schema_exists == (1,)
+
 
 @pytest.mark.order(10)
 def test_create_or_append_table_from_df():
@@ -73,6 +77,7 @@ def test_create_or_append_table_from_df():
     ).fetchone()
     assert table_exists == (1,)
 
+
 @pytest.mark.order(11)
 def test_select_duckdb_table():
     """
@@ -88,6 +93,7 @@ def test_select_duckdb_table():
     selected_df = select_duckdb_table(conn, "config", "test_table")
     assert selected_df.shape[0] == 3
 
+
 @pytest.mark.order(12)
 def test_check_table_exists():
     """
@@ -100,6 +106,7 @@ def test_check_table_exists():
     conn.execute("CREATE TABLE test_table (col1 INT)")
     table_exists = check_table_exists("config", "test_table", conn)
     assert table_exists is True
+
 
 @pytest.mark.order(13)
 def test_create_config_tables():

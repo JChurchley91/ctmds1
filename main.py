@@ -102,7 +102,8 @@ def model_prices(request: GeneratePricesRequest) -> GeneratePricesResponse:
             request.country_code,
             request.granularity,
             request.commodity,
-            "price_data",)
+            "price_data",
+        )
         response = GeneratePricesResponse(
             commodity=request.commodity,
             date=request.for_date,

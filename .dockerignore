@@ -10,3 +10,7 @@ __pycache__
 README.md
 Dockerfile
 .dockerignore
+*.log
+venv
+*.egg-info
+*.DS_Store

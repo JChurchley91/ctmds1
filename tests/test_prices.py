@@ -23,7 +23,7 @@ def setup_db():
     yield conn
     
 @pytest.mark.order(1)
-def test_hours_in_day():
+def test_hours_in_day(setup_db):
     """
     Test the hours_in_day function.
     Assert that 24 hours are returned for a specified date - 2025-29-03.

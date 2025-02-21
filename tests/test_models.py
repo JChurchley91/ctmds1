@@ -1,6 +1,7 @@
 import sys
 import os
 import datetime
+import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -8,6 +9,7 @@ from models.requests import GeneratePricesRequest
 from models.responses import GeneratePricesResponse
 
 
+@pytest.mark.order(14)
 def test_generate_prices_request_model():
     """
     Test the GeneratePricesRequest model.
@@ -26,6 +28,7 @@ def test_generate_prices_request_model():
     assert request.commodity == "power"
 
 
+@pytest.mark.order(5)
 def test_generate_prices_response_model():
     """
     Test the GeneratePricesResponse model.

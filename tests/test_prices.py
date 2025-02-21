@@ -10,14 +10,17 @@ from modelling.seasonality import get_hours_in_day
 from db.utils import create_duckdb_db, return_duckdb_conn, create_schemas, create_config_tables
 
 
-def setup_function():
+@pytest.fixture(scope="session", autouse=True)
+def setup_db():
     """
-    Setup function for the tests.
+    Fixture to setup the database.
     """
     create_duckdb_db('test.db')
     conn = return_duckdb_conn('test.db')
     create_schemas(conn)
     create_config_tables(conn)
+    print('yest')
+    yield conn
     
 @pytest.mark.order(1)
 def test_hours_in_day():

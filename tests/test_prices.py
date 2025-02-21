@@ -30,7 +30,7 @@ def test_generate_prices():
     date = datetime.datetime(2025, 3, 29, 0, 0, 0)
     country_code = "GB"
     granularity = "h"
-    commodity = "wind"
+    commodity = "power"
 
     assert model_daily_prices(date, country_code, granularity, commodity) is not None
     assert len(model_daily_prices(date, country_code, granularity, commodity)) == 24

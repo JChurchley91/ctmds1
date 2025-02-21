@@ -1,6 +1,6 @@
-from enum import Enum
-
 import polars
+
+from enum import Enum
 
 
 class CountryCodes(str, Enum):
@@ -22,10 +22,10 @@ class CountryCodes(str, Enum):
         :return: base price for specified country code
         """
         price_mapping = {
-            "GB": 61,
-            "FR": 58,
-            "NL": 52,
-            "DE": 57,
+            "GB": 80,
+            "FR": 80,
+            "NL": 80,
+            "DE": 80,
         }
 
         return price_mapping[country_code]
@@ -63,12 +63,9 @@ class Granularity(str, Enum):
 
 
 class Commodity(str, Enum):
-    wind = "wind"
+    power = "power"
     natural_gas = "natural_gas"
-    nuclear = "nuclear"
-    solar = "solar"
-    hydro = "hydro"
-    biofuel = "biofuel"
+    crude = "crude"
 
     @classmethod
     def return_as_df(cls) -> polars.DataFrame:
@@ -89,7 +86,7 @@ class CountryEnergyMix(str, Enum):
     DE = "DE"
 
     @classmethod
-    def get_energy_mix(cls, country_code: str, commodity: str) -> float:
+    def get_energy_mix(cls, country_code: str, generation_source: str) -> float:
         energy_mix_mapping = {
             "GB": {
                 "wind": 20,
@@ -124,7 +121,7 @@ class CountryEnergyMix(str, Enum):
                 "biofuel": 10,
             },
         }
-        return energy_mix_mapping[country_code][commodity]
+        return energy_mix_mapping[country_code][generation_source]
 
     @classmethod
     def return_as_df(cls) -> polars.DataFrame:

@@ -32,14 +32,14 @@ def test_granularity():
     assert Granularity.return_as_df().shape[0] == 2
 
 
-def test_commodity():
+def test_commodities():
     """
     Test the commodity enum.
     Assert that the Commodity Enum class returns the correct commodities.
     Assert that the enum also returns a Polars DataFrame containing the correct size df.
     :return: None
     """
-    assert Commodity.wind == "wind"
+    assert Commodity.power == "power"
     assert Commodity.natural_gas == "natural_gas"
-    assert Commodity.solar == "solar"
-    assert Commodity.return_as_df().shape[0] == 6
+    assert Commodity.crude == "crude"
+    assert Commodity.return_as_df().shape[0] == 3

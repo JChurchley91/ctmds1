@@ -18,12 +18,12 @@ def test_generate_prices_request_model():
         for_date=datetime.datetime(2025, 5, 2, 0, 0),
         country_code="GB",
         granularity="h",
-        commodity="wind",
+        commodity="power",
     )
     assert request.for_date == datetime.datetime(2025, 5, 2, 0, 0)
     assert request.country_code == "GB"
     assert request.granularity == "h"
-    assert request.commodity == "wind"
+    assert request.commodity == "power"
 
 
 def test_generate_prices_response_model():
@@ -33,13 +33,13 @@ def test_generate_prices_response_model():
     :return: None
     """
     response = GeneratePricesResponse(
-        commodity="wind",
+        commodity="power",
         date=datetime.datetime(2025, 5, 2, 0, 0),
         country_code="GB",
         granularity="h",
         prices=[1.0, 2.0, 3.0, 4.0],
     )
-    assert response.commodity == "wind"
+    assert response.commodity == "power"
     assert response.date == datetime.datetime(2025, 5, 2, 0, 0)
     assert response.country_code == "GB"
     assert response.granularity == "h"

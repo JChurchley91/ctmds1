@@ -1,12 +1,7 @@
 import pytest
 
 from datetime import datetime
-from modelling.seasonality import (
-    get_season,
-    model_seasonality,
-    model_peak_hours,
-    model_off_peak_hours,
-)
+from modelling.seasonality import get_season
 
 @pytest.mark.order(6)
 def test_get_season():

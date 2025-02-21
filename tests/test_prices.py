@@ -13,7 +13,7 @@ from db.utils import create_duckdb_db, return_duckdb_conn, create_schemas, creat
 @pytest.fixture(scope="session", autouse=True)
 def setup_db():
     """
-    Fixture to setup the database.
+    Fixture to set up the database.
     """
     create_duckdb_db('test.db')
     conn = return_duckdb_conn('test.db')
@@ -46,11 +46,12 @@ def test_generate_prices():
     country_code = "GB"
     granularity = "h"
     commodity = "power"
+    db_name = "test"
 
-    assert model_daily_prices(date, country_code, granularity, commodity) is not None
-    assert len(model_daily_prices(date, country_code, granularity, commodity)) == 24
+    assert model_daily_prices(date, country_code, granularity, commodity, db_name) is not None
+    assert len(model_daily_prices(date, country_code, granularity, commodity, db_name)) == 24
 
     granularity = "hh"
 
-    assert model_daily_prices(date, country_code, granularity, commodity) is not None
-    assert len(model_daily_prices(date, country_code, granularity, commodity)) == 48
+    assert model_daily_prices(date, country_code, granularity, commodity, db_name) is not None
+    assert len(model_daily_prices(date, country_code, granularity, commodity, db_name)) == 48

@@ -14,14 +14,14 @@ from modelling.seasonality import (
 )
 
 
-def get_base_price(country_code: str) -> int:
+def get_base_price(country_code: str, db_name: str) -> int:
     """
     Select the base prices from config.country_codes table.
     Filter the base prices based on the country_code param.
 
     :return: dict
     """
-    conn = return_duckdb_conn("price_data.db")
+    conn = return_duckdb_conn(f"{db_name}.db")
     df = select_duckdb_table(conn, "config", "country_codes")
     base_price = (
         df.filter(polars.col("country_code") == country_code)
@@ -32,15 +32,16 @@ def get_base_price(country_code: str) -> int:
     return base_price
 
 
-def get_country_energy_mix(country_code: str) -> dict:
+def get_country_energy_mix(country_code: str, db_name: str) -> dict:
     """
     Select the country energy mix from config.country_energy_mix table.
     Filter the country energy mix based on the country_code param.
 
     :param country_code: country code to filter the df on
+    :param db_name: name of the database to connect to
     :return: energy mix for given country code
     """
-    conn = return_duckdb_conn("price_data.db")
+    conn = return_duckdb_conn(f"{db_name}.db")
     df = select_duckdb_table(conn, "config", "country_energy_mix")
     df = df.filter(polars.col("country_code") == country_code)
     df = df.select("wind", "solar", "nuclear", "hydro", "biofuel", "natural_gas")
@@ -76,6 +77,7 @@ def model_daily_prices(
     country_code: str,
     granularity: str,
     commodity: str,
+    db_name: str,
 ) -> np.ndarray[float]:
     """
     Return hourly prices for the specified date and country code.
@@ -89,7 +91,7 @@ def model_daily_prices(
     :param commodity: the commodity to return prices for
     :return: None
     """
-    energy_mix = get_country_energy_mix(country_code)
+    energy_mix = get_country_energy_mix(country_code, db_name)
     season = get_season(for_date)
     seasonality_factor = model_seasonality(season, commodity)
     peak_hours = model_peak_hours(season, commodity)
@@ -97,10 +99,10 @@ def model_daily_prices(
     hours_in_for_date = get_hours_in_day(for_date, "Europe/London")
 
     if commodity == "power":
-        base_price = get_base_price(country_code)
+        base_price = get_base_price(country_code, db_name)
         base_price = model_base_price_from_energy_mix(base_price, energy_mix)
     else:
-        base_price = get_base_price(country_code)
+        base_price = get_base_price(country_code, db_name)
 
     if granularity == "h":
         prices: ndarray = np.random.normal(

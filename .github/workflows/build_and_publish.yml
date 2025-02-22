@@ -28,4 +28,5 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
+        tags: ghcr.io/${{ github.repository }}/model-price-api:latest
         push: true

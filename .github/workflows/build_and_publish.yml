@@ -22,9 +22,11 @@ jobs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.PERSONAL_AUTH }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
         context: .
+        tags: ghcr.io/jchurchley91/ctmds1/model-price-api:latest
+        push: true

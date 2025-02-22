@@ -1,34 +1,13 @@
 import sys
 import os
 import datetime
-import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from modelling.prices import model_daily_prices
 from modelling.seasonality import get_hours_in_day
-from db.utils import (
-    create_duckdb_db,
-    return_duckdb_conn,
-    create_schemas,
-    create_config_tables,
-)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_db():
-    """
-    Fixture to set up the database.
-    """
-    create_duckdb_db("test.db")
-    conn = return_duckdb_conn("test.db")
-    create_schemas(conn)
-    create_config_tables(conn)
-    print("yest")
-    yield conn
-
-
-@pytest.mark.order(1)
 def test_hours_in_day(setup_db):
     """
     Test the hours_in_day function.
@@ -42,7 +21,6 @@ def test_hours_in_day(setup_db):
     assert get_hours_in_day(date_2, "Europe/London") == 23
 
 
-@pytest.mark.order(2)
 def test_generate_prices():
     """
     Test the generate_prices function.

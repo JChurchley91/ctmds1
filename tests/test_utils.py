@@ -1,7 +1,6 @@
 import sys
 import os
 import polars
-import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -16,17 +15,6 @@ from db.utils import (
 )
 
 
-@pytest.fixture(scope="session", autouse=True)
-def teardown_session():
-    """
-    Teardown function to delete the test.db file after tests are done.
-    """
-    yield
-    if os.path.exists("test.db"):
-        os.remove("test.db")
-
-
-@pytest.mark.order(7)
 def test_create_duckdb_db():
     """
     Test the create_duckdb_db function.
@@ -36,7 +24,6 @@ def test_create_duckdb_db():
     assert conn is True
 
 
-@pytest.mark.order(8)
 def test_return_duckdb_conn():
     """
     Test the return_duckdb_conn function.
@@ -46,7 +33,6 @@ def test_return_duckdb_conn():
     assert conn is not None
 
 
-@pytest.mark.order(9)
 def test_create_schemas():
     """
     Test the create_config_schema function.
@@ -61,7 +47,6 @@ def test_create_schemas():
     assert schema_exists == (1,)
 
 
-@pytest.mark.order(10)
 def test_create_or_append_table_from_df():
     """
     Test the create_table_from_df function.
@@ -78,7 +63,6 @@ def test_create_or_append_table_from_df():
     assert table_exists == (1,)
 
 
-@pytest.mark.order(11)
 def test_select_duckdb_table():
     """
     Test the select_duckdb_table function.
@@ -94,7 +78,6 @@ def test_select_duckdb_table():
     assert selected_df.shape[0] == 3
 
 
-@pytest.mark.order(12)
 def test_check_table_exists():
     """
     Test the check_table_exists function.
@@ -108,7 +91,6 @@ def test_check_table_exists():
     assert table_exists is True
 
 
-@pytest.mark.order(13)
 def test_create_config_tables():
     """
     Test the create_config_tables function.

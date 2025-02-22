@@ -1,113 +1,96 @@
+# Price Data API
+
+## Overview
+
+The Price Data API is a FastAPI-based application that provides endpoints for modeling and retrieving daily prices for various commodities. The application uses DuckDB for data storage and Loguru for logging.
+
+## Features
+
+- Model daily prices for specified dates, country codes, granularities, and commodities.
+- Retrieve historic daily prices from the database.
+- Automatically save modeled prices to the database if they do not already exist.
+
+## Requirements
+
+- Python 3.11
+- Docker
+- GitHub Actions
+
 ## Installation
 
 1. Clone the repository:
-    ```bash
-    git clone <repository_url>
-    cd <repository_directory>
+    ```sh
+    git clone https://github.com/jchurchley91/ctmds1.git
+    cd ctmds1
     ```
 
-2. Create a virtual environment and activate it:
-    ```bash
+2. Create and activate a virtual environment:
+    ```sh
     python -m venv venv
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
 
 3. Install the dependencies:
-    ```bash
+    ```sh
     pip install -r requirements.txt
     ```
 
-## Generating Random Numbers
+## Usage
 
-To generate random numbers, run the main.py file with the desired strategy and number count.
+1. Run the FastAPI application:
+    ```sh
+    uvicorn main:app --reload
+    ```
 
-### Available Strategies
+2. Access the API documentation at `http://127.0.0.1:8000/docs`.
 
-The following strategies are available for generating random numbers:
+## Endpoints
 
-- `basic_generator`
-- `numpy_generator`
+- **POST /model-prices**: Model and retrieve daily prices for the specified date, country code, granularity, and commodity.
 
-### Command Syntax
+## Logging
 
-```bash
-python main.py --commmand-name --strategy-name <strategy_name> --number-count <number_count>
-```
+Logs are stored in the `logs` directory with a filename format of `daily-prices-YYYY-MM-DD.log`. Logs are rotated and retained for 1 hour.
 
-#### Examples
+## Database
 
-Generate 10 random numbers using the basic_generator strategy:
+The application uses DuckDB for data storage. The database is initialized with the following steps:
+- Create the database file.
+- Create necessary schemas and configuration tables.
 
-```bash
-python main.py generate-random-numbers --strategy-name basic_generator --number-count 10
-```
+## GitHub Actions
 
-Generate 20 random numbers using the numpy_generator strategy:
+### Workflows
 
-```bash
-python main.py generate-random-numbers --strategy-name numpy_generator --number-count 20
-```
+- **run_tests.yml**: Runs tests on every push.
+- **build_and_publish.yml**: Builds and publishes the Docker image to GitHub Container Registry on push to the `master` branch.
 
-## Generating Random Prices
+### Example Workflow Configuration
 
-To generate random daily prices, run the main.py file with the desired date, country code and granularity.
+#### run_tests.yml
 
-### Available Country Codes
+```yaml
+name: run tests
 
-The following country codes are available for generating random daily prices:
+on: [push]
 
-- 'GB'
-- 'FR'
-- 'NL'
-- 'DE'
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-## Available Granularity
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-The following granularity are available for generating random daily prices:
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
 
-- 'h' (hourly)
-- 'hh' (half-hourly)
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-### Command Syntax
-
-```bash
-python main.py --commmand-name --for-date <for_date> --country-code <country_code> --granularity <granularity> --commodity <commodity>
-```
-
-#### Examples
-
-Generate hourly prices for 2025-05-02 for GB:
-
-```bash
-python main.py model-prices --for-date 2025-05-02 --country-code GB --granularity h --commodity crude
-```
-
-Generate half-hourly prices for 2025-05-02 for DE:
-
-```bash
-python main.py model-prices --for-date 2025-05-02 --country-code DE --granularity hh --commodity power  
-```
-
-
-### Testing
-
-To run the tests, use the following command:
-
-```bash
-pytest
-```
-
-### Project Structure
-
-The project has the following structure:
-
-* main.py: The main application file containing the command-line interface and logic.
-* strategies/: Directory containing the random number generation strategies.
-    * strategies/basic_generator.py: A basic random number generator strategy.
-    * strategies/numpy_generator.py: A random number generator strategy using NumPy.
-    * strategies/price_model.py: A random price model generator.
-* utils/: Directory containing utility functions.
-  * utils/timer.py: Utility functions for logging generation time.
-  * utils/validators.py: Utility functions for validating input arguments.
-  * utils/seas.py: Utility functions for generating seasonal data.
-* tests/: Directory containing test files.
+    - name: Run tests
+      run: pytest

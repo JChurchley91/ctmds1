@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,5 +28,3 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        push: true
-        tags: ghcr.io/${{ github.repository }}/model-price-api:latest
